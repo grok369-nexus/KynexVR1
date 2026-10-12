@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
+import { projectileState, solveProjectile } from './physics/engine'
 
 const G = 9.81
-const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 
 export default function ProjectileLab({ onSummaryChange }: { onSummaryChange?: (summary: string) => void }) {
   const [speed, setSpeed] = useState(18)
@@ -11,16 +11,10 @@ export default function ProjectileLab({ onSummaryChange }: { onSummaryChange?: (
   const [time, setTime] = useState(0)
   const [playing, setPlaying] = useState(false)
 
-  const model = useMemo(() => {
-    const radians = angle * Math.PI / 180
-    const ux = speed * Math.cos(radians)
-    const uy = speed * Math.sin(radians)
-    const flightTime = (uy + Math.sqrt(uy * uy + 2 * gravity * height)) / gravity
-    const range = ux * flightTime
-    const maxHeight = height + (uy * uy) / (2 * gravity)
-    const maxTime = uy / gravity
-    return { ux, uy, flightTime, range, maxHeight, maxTime }
-  }, [speed, angle, height, gravity])
+  const model = useMemo(() => solveProjectile(speed, angle, height, gravity), [speed, angle, height, gravity])
+  const ux = model.horizontalVelocity
+  const uy = model.verticalVelocity
+  const maxHeight = model.maximumHeight
 
   useEffect(() => {
     setTime(0)
@@ -39,22 +33,23 @@ export default function ProjectileLab({ onSummaryChange }: { onSummaryChange?: (
     if (playing && time >= model.flightTime) setPlaying(false)
   }, [playing, time, model.flightTime])
 
-  const t = clamp(time, 0, model.flightTime)
-  const ballX = model.ux * t
-  const ballY = height + model.uy * t - 0.5 * gravity * t * t
+  const state = projectileState(model, time, height, gravity)
+  const t = state.time
+  const ballX = state.position.x
+  const ballY = state.position.y
   const scaleX = 500 / Math.max(model.range, 1)
-  const scaleY = 205 / Math.max(model.maxHeight, 1)
+  const scaleY = 205 / Math.max(maxHeight, 1)
   const pointX = (x: number) => 34 + x * scaleX
   const pointY = (y: number) => 265 - y * scaleY
   const trajectory = Array.from({ length: 51 }, (_, i) => {
     const sampleT = model.flightTime * i / 50
-    const x = model.ux * sampleT
-    const y = Math.max(0, height + model.uy * sampleT - 0.5 * gravity * sampleT * sampleT)
+    const x = ux * sampleT
+    const y = Math.max(0, height + uy * sampleT - 0.5 * gravity * sampleT * sampleT)
     return `${i === 0 ? 'M' : 'L'} ${pointX(x).toFixed(2)} ${pointY(y).toFixed(2)}`
   }).join(' ')
-  const currentSpeed = Math.hypot(model.ux, model.uy - gravity * t)
-  const currentHeight = Math.max(0, ballY)
-  useEffect(() => { onSummaryChange?.(`Projectile: range ${model.range.toFixed(2)} m, flight time ${model.flightTime.toFixed(2)} s, maximum height ${model.maxHeight.toFixed(2)} m at ${angle}°.`) }, [onSummaryChange, model.range, model.flightTime, model.maxHeight, angle])
+  const currentSpeed = state.speed
+  const currentHeight = ballY
+  useEffect(() => { onSummaryChange?.(`Projectile: range ${model.range.toFixed(2)} m, flight time ${model.flightTime.toFixed(2)} s, maximum height ${maxHeight.toFixed(2)} m at ${angle}°.`) }, [onSummaryChange, model.range, model.flightTime, model.maxHeight, angle])
 
   return <div className="ph-lab">
     <div className="ph-sim-canvas">
@@ -69,7 +64,7 @@ export default function ProjectileLab({ onSummaryChange }: { onSummaryChange?: (
         <line x1={pointX(0)} y1={pointY(height)} x2={pointX(0) + 52 * Math.cos(angle * Math.PI / 180)} y2={pointY(height) - 52 * Math.sin(angle * Math.PI / 180)} stroke="#f1bd69" strokeWidth="2.5" markerEnd="url(#ph-projectile-arrow)" />
         <path d={`M ${pointX(0) + 25} ${pointY(height)} A 25 25 0 0 0 ${pointX(0) + 25 * Math.cos(angle * Math.PI / 180)} ${pointY(height) - 25 * Math.sin(angle * Math.PI / 180)}`} fill="none" stroke="#f1bd69" strokeWidth="1.5" />
         <line x1={pointX(ballX)} y1={pointY(currentHeight)} x2={pointX(ballX)} y2="265" stroke="#5c8290" strokeDasharray="4 5" />
-        <circle cx={pointX(ballX)} cy={pointY(currentHeight)} r="7" fill="#f1bd69" stroke="#fff0ce" strokeWidth="2" />
+        <circle cx={pointX(ballX)} cy={pointY(currentHeight)} r="4" fill="#f1bd69" stroke="#fff0ce" strokeWidth="1.5" />
         <text x="28" y="287" fill="#8faab5" fontSize="11">Launch</text>
         <text x="490" y="287" fill="#8faab5" fontSize="11">Range →</text>
         <text x={pointX(0) + 30} y={pointY(height) - 13} fill="#f1bd69" fontSize="12">{angle}°</text>
