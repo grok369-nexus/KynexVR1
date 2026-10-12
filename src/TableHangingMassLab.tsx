@@ -23,14 +23,14 @@ export default function TableHangingMassLab({ onSummaryChange }: Props) {
   useEffect(() => {
     if (!running) return
     const timer = window.setInterval(() => {
-      setTime(current => {
-        const next = Math.min(MAX_TIME, current + 0.025)
-        if (next >= MAX_TIME) setRunning(false)
-        return next
-      })
+      setTime(current => Math.min(MAX_TIME, current + 0.025))
     }, 25)
     return () => window.clearInterval(timer)
   }, [running])
+
+  useEffect(() => {
+    if (time >= MAX_TIME) setRunning(false)
+  }, [time])
 
   useEffect(() => {
     onSummaryChange?.(
