@@ -8,6 +8,7 @@ import {
 } from '../.physics-test-build/world.js'
 import {
   solveAtwood,
+  solveTableHangingMass,
   solveCircularMotion,
   solveCoulombForce,
   solveInclinedPlane,
@@ -39,6 +40,23 @@ test('equal Atwood masses have zero acceleration and non-zero tension', () => {
 test('Atwood machine flags non-physical masses', () => {
   assert.equal(solveAtwood(0, 2).valid, false)
   assert.equal(solveAtwood(-1, 2).valid, false)
+})
+
+test('table block and hanging mass obey Newton laws and ideal-string constraint', () => {
+  const model = solveTableHangingMass(3, 2)
+  assert.equal(model.valid, true)
+  near(model.acceleration, 2 * 9.81 / 5)
+  near(model.tension, 3 * 2 * 9.81 / 5)
+  near(model.tableBlockWeight, 3 * 9.81)
+  near(model.tableNormalReaction, 3 * 9.81)
+  near(model.hangingWeight - model.tension, 2 * model.acceleration)
+})
+
+test('table-and-hanging-mass model rejects invalid physical inputs', () => {
+  assert.equal(solveTableHangingMass(0, 2).valid, false)
+  assert.equal(solveTableHangingMass(2, -1).valid, false)
+  assert.equal(solveTableHangingMass(2, 1, 0).valid, false)
+  assert.equal(solveTableHangingMass(Number.NaN, 1).valid, false)
 })
 
 test('projectile model agrees with standard level-ground equations', () => {
