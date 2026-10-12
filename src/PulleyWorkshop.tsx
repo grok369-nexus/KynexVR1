@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { solveAtwood } from './physics/engine'
 type Kind = 'ceiling'|'box'|'peak'|'pulley'|'mass'|'anchor'
 type Part = {id:number;kind:Kind;x:number;y:number;size:number;color:string;label:string;mass:number;pulleyMode?:'fixed'|'movable'}
 const colors=['#68dfbd','#b8a9ff','#f1bd69','#ff8c91','#83b9ff','#e6edf0']
@@ -9,7 +10,7 @@ export default function PulleyWorkshop(){
  const [parts,setParts]=useState(start),[tool,setTool]=useState<Tool>('select'),[selected,setSelected]=useState<number|null>(3),[g,setG]=useState(9.81),[u,setU]=useState(0),[time,setTime]=useState(2),[path,setPath]=useState([3,2,4]),[drag,setDrag]=useState<number|null>(null),[forces,setForces]=useState(true),[tensionSegment,setTensionSegment]=useState(0)
  const chosen=parts.find(p=>p.id===selected),masses=parts.filter(p=>p.kind==='mass'),pulleys=parts.filter(p=>p.kind==='pulley')
  const supported=masses.length===2&&pulleys.length===1&&path.length===3&&pulleys[0]?.pulleyMode!=='movable'&&path[1]===pulleys[0]?.id&&parts.find(p=>p.id===path[0])?.kind==='mass'&&parts.find(p=>p.id===path[2])?.kind==='mass'
- const m1=parts.find(p=>p.id===path[0])?.mass||2,m2=parts.find(p=>p.id===path[2])?.mass||4,a=supported?(m2-m1)*g/(m1+m2):0,T=supported?2*m1*m2*g/(m1+m2):0,v=u+a*time,s=u*time+.5*a*time*time
+ const m1=parts.find(p=>p.id===path[0])?.mass||2,m2=parts.find(p=>p.id===path[2])?.mass||4,atwood=solveAtwood(m1,m2,g),a=supported?atwood.acceleration:0,T=supported?atwood.tension:0,v=u+a*time,s=u*time+.5*a*time*time
  const update=(id:number,patch:Partial<Part>)=>setParts(old=>old.map(p=>p.id===id?{...p,...patch}:p))
  const xy=(e:any)=>{const target=e.currentTarget as SVGElement;const svg=(target.tagName.toLowerCase()==='svg'?target:(target as SVGGraphicsElement).ownerSVGElement);const r=(svg||target).getBoundingClientRect();return{x:Math.max(25,Math.min(475,(e.clientX-r.left)/r.width*500)),y:Math.max(25,Math.min(265,(e.clientY-r.top)/r.height*290))}}
  const place=(e:any)=>{if(tool==='select'){setSelected(null);return}const {x,y}=xy(e);if(tool==='string'){const p=[...parts].sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0];if(p&&Math.hypot(p.x-x,p.y-y)<45)setPath(old=>old.length>=3?[p.id]:[...old,p.id]);return}const k=tool as Kind,n=parts.filter(p=>p.kind===k).length+1,id=Math.max(...parts.map(p=>p.id))+1;setParts(old=>[...old,{id,kind:k,x,y,size:1,color:colors[(n-1)%colors.length],label:k==='mass'?String.fromCharCode(64+n):k==='pulley'?'P'+n:names[k],mass:k==='mass'?2:0,pulleyMode:k==='pulley'?'fixed':undefined}]);setSelected(id);setTool('select')}
