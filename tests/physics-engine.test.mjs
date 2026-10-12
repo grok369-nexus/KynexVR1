@@ -1,6 +1,12 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
+  applyForce,
+  createBody,
+  createWorld,
+  stepWorld,
+} from '../.physics-test-build/world.js'
+import {
   solveAtwood,
   solveCircularMotion,
   solveCoulombForce,
