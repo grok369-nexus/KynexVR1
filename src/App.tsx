@@ -99,26 +99,34 @@ function App() {
         <button className="pl-primary" onClick={() => setPage('dashboard')}>Enter the research lab <span>↗</span></button>
         <div className="pl-trust"><span>✓</span> Free to use <span>·</span> Works on mobile <span>·</span> Learn at your pace</div>
       </section>
-      <section className="pl-welcome-art" aria-label="Physics trajectory visualisation">
-        <div className="pl-art-meta"><span>MODEL 001</span><span>PROJECTILE MOTION</span><i>● LIVE MODEL</i></div>
-        <svg className="pl-trajectory-art" viewBox="0 0 620 430" role="img" aria-label="A projectile follows a curved path through a measured coordinate grid">
+      <section className="pl-welcome-art" aria-label="Live-style physics visualisation">
+        <div className="pl-art-meta"><span>PHYSICS ENGINE / 001</span><span>TRAJECTORY FIELD</span><i>● MODEL READY</i></div>
+        <svg className="pl-trajectory-art" viewBox="0 0 620 430" role="img" aria-label="Glowing projectile path through a deep-space coordinate field">
           <defs>
-            <pattern id="physics-grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M 30 0 L 0 0 0 30" fill="none" stroke="#c7d0cc" strokeWidth="1"/></pattern>
-            <linearGradient id="trajectory-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#315cff" stopOpacity=".22"/><stop offset="100%" stopColor="#315cff" stopOpacity="0"/></linearGradient>
+            <pattern id="physics-grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M 30 0 L 0 0 0 30" fill="none" stroke="#26344d" strokeWidth="1"/></pattern>
+            <radialGradient id="field-glow"><stop offset="0%" stopColor="#6a4dff" stopOpacity=".26"/><stop offset="100%" stopColor="#6a4dff" stopOpacity="0"/></radialGradient>
+            <linearGradient id="trajectory-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#36e5ff" stopOpacity=".25"/><stop offset="100%" stopColor="#36e5ff" stopOpacity="0"/></linearGradient>
+            <linearGradient id="trajectory-line" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#8b76ff"/><stop offset="50%" stopColor="#36e5ff"/><stop offset="100%" stopColor="#ffb45f"/></linearGradient>
+            <filter id="neon-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
           </defs>
+          <rect width="620" height="430" fill="#080d18"/>
+          <circle cx="430" cy="125" r="210" fill="url(#field-glow)"/>
           <rect x="24" y="24" width="572" height="356" fill="url(#physics-grid)"/>
-          <path d="M70 340 H560 M70 340 V55" stroke="#303b39" strokeWidth="2" fill="none"/>
-          <path d="M550 332 L560 340 L550 348 M62 65 L70 55 L78 65" stroke="#303b39" strokeWidth="2" fill="none"/>
+          <g stroke="#33415d" strokeWidth="1" fill="none" opacity=".75"><circle cx="420" cy="195" r="42"/><circle cx="420" cy="195" r="78"/><circle cx="420" cy="195" r="116"/><path d="M420 42V350M267 195H573"/></g>
+          <path d="M70 340 H560 M70 340 V55" stroke="#65748e" strokeWidth="1.5" fill="none"/>
+          <path d="M550 332 L560 340 L550 348 M62 65 L70 55 L78 65" stroke="#65748e" strokeWidth="1.5" fill="none"/>
           <path d="M92 320 Q290 -80 510 320 L92 320Z" fill="url(#trajectory-fill)"/>
-          <path d="M92 320 Q290 -80 510 320" stroke="#315cff" strokeWidth="5" strokeLinecap="round" fill="none"/>
-          <path d="M92 320 L170 220" stroke="#ff684d" strokeWidth="3" strokeDasharray="7 7"/>
-          <path d="M151 220 L170 220 L168 239" stroke="#ff684d" strokeWidth="3" fill="none"/>
-          <circle cx="92" cy="320" r="11" fill="#ff684d" stroke="#fffaf1" strokeWidth="5"/>
-          <circle cx="290" cy="120" r="11" fill="#315cff" stroke="#fffaf1" strokeWidth="5"/>
-          <circle cx="510" cy="320" r="11" fill="#ff684d" stroke="#fffaf1" strokeWidth="5"/>
-          <path d="M290 120 V340 M92 320 H290" stroke="#82918a" strokeWidth="1.5" strokeDasharray="5 6"/>
-          <g fill="#303b39" fontFamily="monospace" fontSize="13"><text x="80" y="365">0</text><text x="280" y="365">x</text><text x="40" y="126">y</text><text x="304" y="108">APEX</text><text x="122" y="250" fill="#ff684d">v₀</text><text x="404" y="286">RANGE →</text></g>
-          <g transform="translate(372 54)"><rect width="180" height="65" rx="2" fill="#fffaf1" stroke="#d5d8cf"/><text x="14" y="22" fontFamily="monospace" fontSize="10" fill="#727e77">VERTICAL MOTION</text><text x="14" y="47" fontFamily="monospace" fontSize="17" fill="#315cff">vᵧ = uᵧ − gt</text></g>
+          <path d="M92 320 Q290 -80 510 320" stroke="#36e5ff" strokeWidth="10" strokeLinecap="round" fill="none" opacity=".12" filter="url(#neon-glow)"/>
+          <path d="M92 320 Q290 -80 510 320" stroke="url(#trajectory-line)" strokeWidth="3.5" strokeLinecap="round" fill="none" filter="url(#neon-glow)"/>
+          <path d="M92 320 L170 220" stroke="#ffb45f" strokeWidth="2.5" strokeDasharray="5 6"/>
+          <path d="M151 220 L170 220 L168 239" stroke="#ffb45f" strokeWidth="2" fill="none"/>
+          <circle cx="92" cy="320" r="7" fill="#ffb45f" filter="url(#neon-glow)"/>
+          <circle cx="290" cy="120" r="7" fill="#36e5ff" filter="url(#neon-glow)"/>
+          <circle cx="510" cy="320" r="7" fill="#ffb45f" filter="url(#neon-glow)"/>
+          <path d="M290 120 V340 M92 320 H290" stroke="#536480" strokeWidth="1.3" strokeDasharray="4 6"/>
+          <g fill="#9aabc7" fontFamily="monospace" fontSize="12"><text x="80" y="365">0</text><text x="280" y="365">x</text><text x="42" y="126">y</text><text x="304" y="108" fill="#36e5ff">APEX</text><text x="122" y="250" fill="#ffb45f">v₀</text><text x="404" y="286" fill="#36e5ff">RANGE →</text></g>
+          <g transform="translate(366 48)"><rect width="190" height="72" rx="8" fill="#101a2b" stroke="#344968"/><circle cx="14" cy="18" r="3" fill="#36e5ff"/><text x="26" y="22" fontFamily="monospace" fontSize="9" fill="#8ea2c2">VERTICAL MOTION</text><text x="14" y="49" fontFamily="monospace" fontSize="17" fill="#36e5ff">vᵧ = uᵧ − gt</text><text x="14" y="63" fontFamily="monospace" fontSize="8" fill="#7186a8">IDEAL MODEL / SI UNITS</text></g>
+          <g transform="translate(35 42)" fill="#7488aa" fontFamily="monospace" fontSize="8"><text x="0" y="0">SIMULATION 001</text><text x="0" y="14" fill="#36e5ff">● COMPUTATIONAL FIELD</text></g>
         </svg>
         <div className="pl-art-caption"><span className="pl-live-dot" /> CHANGE THE CONDITIONS. WATCH THE MODEL RESPOND.</div>
       </section>
