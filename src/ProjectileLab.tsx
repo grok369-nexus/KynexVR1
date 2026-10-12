@@ -49,7 +49,7 @@ export default function ProjectileLab({ onSummaryChange }: { onSummaryChange?: (
   }).join(' ')
   const currentSpeed = state.speed
   const currentHeight = ballY
-  useEffect(() => { onSummaryChange?.(`Projectile: range ${model.range.toFixed(2)} m, flight time ${model.flightTime.toFixed(2)} s, maximum height ${maxHeight.toFixed(2)} m at ${angle}°.`) }, [onSummaryChange, model.range, model.flightTime, model.maxHeight, angle])
+  useEffect(() => { onSummaryChange?.(`Projectile: range ${model.range.toFixed(2)} m, flight time ${model.flightTime.toFixed(2)} s, maximum height ${maxHeight.toFixed(2)} m at ${angle}°.`) }, [onSummaryChange, model.range, model.flightTime, maxHeight, angle])
 
   return <div className="ph-lab">
     <div className="ph-sim-canvas">
@@ -85,7 +85,7 @@ export default function ProjectileLab({ onSummaryChange }: { onSummaryChange?: (
     <div className="ph-readouts">
       <div><span>Horizontal range</span><strong>{model.range.toFixed(2)} <small>m</small></strong></div>
       <div><span>Flight time</span><strong>{model.flightTime.toFixed(2)} <small>s</small></strong></div>
-      <div><span>Maximum height</span><strong>{model.maxHeight.toFixed(2)} <small>m</small></strong></div>
+      <div><span>Maximum height</span><strong>{maxHeight.toFixed(2)} <small>m</small></strong></div>
       <div><span>Speed now</span><strong>{currentSpeed.toFixed(2)} <small>m/s</small></strong></div>
     </div>
     <div className="ph-explanation">
