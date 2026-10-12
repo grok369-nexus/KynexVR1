@@ -40,9 +40,7 @@ function App() {
   const [speed, setSpeed] = useState(4)
   const [radius, setRadius] = useState(1.5)
   const [rotatingMass, setRotatingMass] = useState(0.5)
-  const [angle, setAngle] = useState(45)
   const [height, setHeight] = useState(1.5)
-  const [launchSpeed, setLaunchSpeed] = useState(12)
   const [observations, setObservations] = useState<string[]>([])
   const [labSummary, setLabSummary] = useState('')
   const topic = topics.find(item => item.id === topicId) ?? topics[0]
@@ -53,8 +51,6 @@ function App() {
   const coulombForce = useMemo(() => 8.99e9 * Math.abs(chargeA * 1e-6 * chargeB * 1e-6) / (distance * distance), [chargeA, chargeB, distance])
   const centripetalAcceleration = speed * speed / radius
   const centripetalForce = rotatingMass * centripetalAcceleration
-  const flightTime = (2 * launchSpeed * Math.sin(angle * Math.PI / 180)) / 9.81
-  const projectileRange = (launchSpeed * launchSpeed * Math.sin(2 * angle * Math.PI / 180)) / 9.81
   const openTopic = (id: TopicId) => {
     const selected = topics.find(item => item.id === id) ?? topics[0]
     setTopicId(id)
