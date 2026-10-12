@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 
-export default function PendulumLab() {
+export default function PendulumLab({ onSummaryChange }: { onSummaryChange?: (summary: string) => void }) {
   const [length, setLength] = useState(1.2)
   const [mass, setMass] = useState(0.5)
   const [amplitude, setAmplitude] = useState(25)
@@ -34,6 +34,7 @@ export default function PendulumLab() {
   const bobY = pivotY + radius * Math.cos(angleNow)
   const leftX = pivotX - radius * Math.sin(model.theta0)
   const rightX = pivotX + radius * Math.sin(model.theta0)
+  useEffect(() => { onSummaryChange?.(`Simple pendulum: period ${model.period.toFixed(3)} s, frequency ${model.frequency.toFixed(3)} Hz, maximum speed ${model.maxSpeed.toFixed(2)} m/s; length ${length.toFixed(2)} m, gravity ${gravity.toFixed(2)} m/s².`) }, [onSummaryChange, model.period, model.frequency, model.maxSpeed, length, gravity])
 
   return <div className="ph-lab">
     <div className="ph-sim-canvas">
