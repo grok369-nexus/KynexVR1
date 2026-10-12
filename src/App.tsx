@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import PulleyWorkshop from './PulleyWorkshop'
+import TableHangingMassLab from './TableHangingMassLab'
 import { solveAtwood, solveCircularMotion, solveCoulombForce } from './physics/engine'
 import ProjectileLab from './ProjectileLab'
 import InclinedPlaneLab from './InclinedPlaneLab'
@@ -7,11 +8,12 @@ import PendulumLab from './PendulumLab'
 
 type Page = 'welcome' | 'dashboard' | 'topic'
 type TopicId = 'mechanics' | 'electrostatics' | 'circular'
-type ExperimentId = 'atwood' | 'projectile' | 'freefall' | 'inclined' | 'pendulum' | 'coulomb' | 'fields' | 'potential' | 'centripetal' | 'period' | 'orbit'
+type ExperimentId = 'atwood' | 'table-hanging' | 'projectile' | 'freefall' | 'inclined' | 'pendulum' | 'coulomb' | 'fields' | 'potential' | 'centripetal' | 'period' | 'orbit'
 
 const topics: { id: TopicId; number: string; title: string; subtitle: string; icon: string; count: string; color: string; experiments: { id: ExperimentId; title: string; detail: string }[] }[] = [
-  { id: 'mechanics', number: '01', title: 'Mechanics', subtitle: 'Motion, forces & energy', icon: '↗', count: '5 investigations', color: 'mint', experiments: [
+  { id: 'mechanics', number: '01', title: 'Mechanics', subtitle: 'Motion, forces & energy', icon: '↗', count: '6 investigations', color: 'mint', experiments: [
     { id: 'atwood', title: 'Pulley system', detail: 'Investigate acceleration and tension as masses change.' },
+    { id: 'table-hanging', title: 'Block + hanging mass', detail: 'Explore connected motion, acceleration and string tension.' },
     { id: 'projectile', title: 'Projectile motion', detail: 'Explore range, flight time and launch angle.' },
     { id: 'inclined', title: 'Inclined plane', detail: 'Resolve forces, friction and acceleration on a slope.' },
     { id: 'pendulum', title: 'Simple pendulum', detail: 'Investigate period, frequency and string length.' },
@@ -64,6 +66,7 @@ function App() {
   const addObservation = () => {
     const value = topicId === 'mechanics'
       ? experiment === 'atwood' ? `Pulley: a = ${acceleration.toFixed(2)} m/s², T = ${tension.toFixed(2)} N (m₁=${massA} kg, m₂=${massB} kg).`
+        : experiment === 'table-hanging' ? (labSummary || 'Change the masses to calculate the connected system.')
         : experiment === 'projectile' || experiment === 'inclined' || experiment === 'pendulum' ? (labSummary || `${currentExperiment.title}: change a control to calculate the result.`)
         : `Free fall from ${height.toFixed(1)} m: ideal fall time ≈ ${Math.sqrt(2 * height / 9.81).toFixed(2)} s.`
       : topicId === 'electrostatics'
@@ -116,6 +119,7 @@ function App() {
         <section className="pl-lab-panel"><div className="pl-lab-panel-head"><div><span className="pl-live-dot" /> INTERACTIVE SIMULATION</div><button onClick={() => setObservations([])}>Clear observations</button></div>
           <div className="pl-sim-title"><div><span className="pl-eyebrow">{topic.title.toUpperCase()}</span><h2>{currentExperiment.title}</h2><p>{currentExperiment.detail}</p></div><span className={`pl-sim-icon ${topic.color}`}>{topic.icon}</span></div>
           {topicId === 'mechanics' && experiment === 'atwood' && <PulleyWorkshop />}
+          {topicId === 'mechanics' && experiment === 'table-hanging' && <TableHangingMassLab onSummaryChange={setLabSummary} />}
           {topicId === 'mechanics' && experiment === 'projectile' && <ProjectileLab onSummaryChange={setLabSummary} />}
           {topicId === 'mechanics' && experiment === 'inclined' && <InclinedPlaneLab onSummaryChange={setLabSummary} />}
           {topicId === 'mechanics' && experiment === 'pendulum' && <PendulumLab onSummaryChange={setLabSummary} />}
