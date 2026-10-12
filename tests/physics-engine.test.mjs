@@ -135,6 +135,25 @@ test('world applies gravity and clears one-step applied forces', () => {
   near(afterTwo.bodies[0].velocity.y, -1.962)
 })
 
+test('smaller world timesteps converge toward the analytic free-fall position', () => {
+  const simulate = (dt, steps) => {
+    let world = createWorld([createBody({
+      id: 'falling-body',
+      mass: 1,
+      position: { x: 0, y: 0 },
+      velocity: { x: 0, y: 0 },
+    })])
+    for (let i = 0; i < steps; i += 1) world = stepWorld(world, dt)
+    return world.bodies[0].position.y
+  }
+
+  const exactPosition = -0.5 * 9.81 * 1 ** 2
+  const coarsePosition = simulate(0.1, 10)
+  const finePosition = simulate(0.01, 100)
+  assert.ok(Math.abs(finePosition - exactPosition) < Math.abs(coarsePosition - exactPosition))
+  near(finePosition, exactPosition, 0.06)
+})
+
 test('world keeps fixed anchors immobile and rejects invalid steps', () => {
   const anchor = createBody({
     id: 'anchor',
