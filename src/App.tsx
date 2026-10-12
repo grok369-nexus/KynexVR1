@@ -1,127 +1,124 @@
 import { useMemo, useState } from 'react'
 
-type Experiment = 'atwood' | 'projectile' | 'ohm'
+type Page = 'welcome' | 'dashboard' | 'topic'
+type TopicId = 'mechanics' | 'electrostatics' | 'circular'
+type ExperimentId = 'atwood' | 'projectile' | 'freefall' | 'coulomb' | 'fields' | 'potential' | 'centripetal' | 'period' | 'orbit'
+
+const topics: { id: TopicId; number: string; title: string; subtitle: string; icon: string; count: string; color: string; experiments: { id: ExperimentId; title: string; detail: string }[] }[] = [
+  { id: 'mechanics', number: '01', title: 'Mechanics', subtitle: 'Motion, forces & energy', icon: '↗', count: '4 investigations', color: 'mint', experiments: [
+    { id: 'atwood', title: 'Pulley system', detail: 'Investigate acceleration and tension as masses change.' },
+    { id: 'projectile', title: 'Projectile motion', detail: 'Explore range, flight time and launch angle.' },
+    { id: 'freefall', title: 'Free fall', detail: 'See how gravity changes velocity and displacement.' },
+  ]},
+  { id: 'electrostatics', number: '02', title: 'Electrostatics', subtitle: 'Charges, fields & potential', icon: '✳', count: '3 investigations', color: 'violet', experiments: [
+    { id: 'coulomb', title: 'Coulomb’s law', detail: 'Change charge and separation to measure electric force.' },
+    { id: 'fields', title: 'Electric field patterns', detail: 'Explore the field around positive and negative charges.' },
+    { id: 'potential', title: 'Electric potential', detail: 'Compare potential as distance from a charge changes.' },
+  ]},
+  { id: 'circular', number: '03', title: 'Circular motion', subtitle: 'Rotation & centripetal force', icon: '⟳', count: '3 investigations', color: 'amber', experiments: [
+    { id: 'centripetal', title: 'Centripetal force', detail: 'Test how speed, mass and radius affect inward force.' },
+    { id: 'period', title: 'Period & frequency', detail: 'Connect rotation time, frequency and angular speed.' },
+    { id: 'orbit', title: 'Circular orbits', detail: 'Explore the balance between speed, radius and gravity.' },
+  ]},
+]
 
 function App() {
-  const [experiment, setExperiment] = useState<Experiment>('atwood')
+  const [page, setPage] = useState<Page>('welcome')
+  const [topicId, setTopicId] = useState<TopicId>('mechanics')
+  const [experiment, setExperiment] = useState<ExperimentId>('atwood')
   const [massA, setMassA] = useState(2)
   const [massB, setMassB] = useState(4)
-  const [running, setRunning] = useState(false)
-  const [time, setTime] = useState(0)
+  const [chargeA, setChargeA] = useState(3)
+  const [chargeB, setChargeB] = useState(-2)
+  const [distance, setDistance] = useState(0.5)
+  const [speed, setSpeed] = useState(4)
+  const [radius, setRadius] = useState(1.5)
+  const [rotatingMass, setRotatingMass] = useState(0.5)
+  const [angle, setAngle] = useState(45)
   const [height, setHeight] = useState(1.5)
+  const [launchSpeed, setLaunchSpeed] = useState(12)
+  const [observations, setObservations] = useState<string[]>([])
+  const topic = topics.find(item => item.id === topicId) ?? topics[0]
+  const currentExperiment = topic.experiments.find(item => item.id === experiment) ?? topic.experiments[0]
 
   const acceleration = useMemo(() => ((massB - massA) * 9.81) / (massA + massB), [massA, massB])
   const tension = useMemo(() => (2 * massA * massB * 9.81) / (massA + massB), [massA, massB])
-  const displacement = Math.min(2.1, Math.max(0, 0.5 * Math.abs(acceleration) * time * time))
-  const reset = () => { setRunning(false); setTime(0) }
+  const coulombForce = useMemo(() => 8.99e9 * Math.abs(chargeA * 1e-6 * chargeB * 1e-6) / (distance * distance), [chargeA, chargeB, distance])
+  const centripetalAcceleration = speed * speed / radius
+  const centripetalForce = rotatingMass * centripetalAcceleration
+  const flightTime = (2 * launchSpeed * Math.sin(angle * Math.PI / 180)) / 9.81
+  const projectileRange = (launchSpeed * launchSpeed * Math.sin(2 * angle * Math.PI / 180)) / 9.81
+  const openTopic = (id: TopicId) => {
+    const selected = topics.find(item => item.id === id) ?? topics[0]
+    setTopicId(id)
+    setExperiment(selected.experiments[0].id)
+    setPage('topic')
+  }
+  const addObservation = () => {
+    const value = topicId === 'mechanics'
+      ? experiment === 'atwood' ? `Pulley: a = ${acceleration.toFixed(2)} m/s², T = ${tension.toFixed(2)} N (m₁=${massA} kg, m₂=${massB} kg).` : experiment === 'projectile' ? `Projectile: range ≈ ${projectileRange.toFixed(2)} m, flight time ≈ ${flightTime.toFixed(2)} s at ${angle}°.` : `Free fall from ${height.toFixed(1)} m: ideal fall time ≈ ${Math.sqrt(2 * height / 9.81).toFixed(2)} s.`
+      : topicId === 'electrostatics'
+        ? experiment === 'coulomb' ? `Coulomb: force ≈ ${coulombForce.toFixed(3)} N; charges are ${chargeA * chargeB < 0 ? 'attractive' : 'repulsive'} at ${distance.toFixed(2)} m.` : `Field exploration: q₁ = ${chargeA} μC, q₂ = ${chargeB} μC, separation = ${distance.toFixed(2)} m.`
+        : `Circular motion: aᶜ = ${centripetalAcceleration.toFixed(2)} m/s², Fᶜ = ${centripetalForce.toFixed(2)} N at v=${speed} m/s, r=${radius} m.`
+    setObservations(prev => [value, ...prev].slice(0, 8))
+  }
 
-  return (
-    <div className="app-shell">
-      <header className="topbar">
-        <a className="brand" href="#" onClick={(e) => { e.preventDefault(); setExperiment('atwood') }}>
-          <span className="brand-mark">P<span>+</span></span>
-          <span>PhysicsLab <b>UG</b><small>LEARN BY EXPERIMENTING</small></span>
-        </a>
-        <nav className="desktop-nav"><a className="active" href="#lab">Virtual lab</a><a href="#experiments">Experiments</a><a href="#about">About</a></nav>
-        <span className="free-pill"><i /> 100% FREE</span>
-      </header>
+  return <div className="pl-app">
+    <header className="pl-topbar">
+      <button className="pl-brand" onClick={() => setPage('welcome')} aria-label="PhysicsLab UG home"><span className="pl-brand-mark">P<span>+</span></span><span><strong>PhysicsLab <i>UG</i></strong><small>LEARN BY EXPERIMENTING</small></span></button>
+      {page !== 'welcome' && <nav className="pl-nav"><button className={page === 'dashboard' ? 'selected' : ''} onClick={() => setPage('dashboard')}>Dashboard</button><button className={page === 'topic' ? 'selected' : ''} onClick={() => setPage('topic')}>Virtual lab</button></nav>}
+      <span className="pl-free"><span /> FREE FOR EVERY LEARNER</span>
+    </header>
 
-      <main>
-        <section className="hero">
-          <div className="hero-copy">
-            <div className="eyebrow"><span>✳</span> YOUR CLASSROOM, REIMAGINED</div>
-            <h1>Big ideas.<br /><em>Real experiments.</em></h1>
-            <p>Explore the laws of Physics by doing, not just reading. A free virtual laboratory made for A-level students in Uganda.</p>
-            <a className="primary-btn" href="#lab">Enter the virtual lab <span>↗</span></a>
-            <div className="hero-proof"><span className="proof-icon">✓</span> No lab equipment needed <span className="proof-dot">·</span> Works on your phone</div>
-          </div>
-          <div className="hero-art" aria-label="Illustration of a virtual physics laboratory">
-            <div className="orbit orbit-one" /><div className="orbit orbit-two" />
-            <div className="art-label label-top"><span className="pulse" /> INTERACTIVE SIMULATION</div>
-            <svg className="hero-illustration" viewBox="0 0 440 340" role="img" aria-label="A mass-and-pulley physics experiment">
-              <defs><linearGradient id="metal" x1="0" x2="1"><stop stopColor="#83a4b8"/><stop offset=".5" stopColor="#e2f1f6"/><stop offset="1" stopColor="#66899e"/></linearGradient><linearGradient id="block" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#59e0bf"/><stop offset="1" stopColor="#159d91"/></linearGradient></defs>
-              <ellipse cx="222" cy="304" rx="156" ry="16" fill="#102b3b"/>
-              <path d="M105 282 V69 Q105 55 119 55 H321 Q335 55 335 69 V282" fill="none" stroke="#345467" strokeWidth="10" strokeLinecap="round"/>
-              <path d="M112 277 V76 Q112 64 124 64 H316 Q328 64 328 76 V277" fill="none" stroke="#7295a8" strokeWidth="2" opacity=".65"/>
-              <path d="M124 64 H316" stroke="url(#metal)" strokeWidth="9" strokeLinecap="round"/>
-              <circle cx="220" cy="81" r="31" fill="#183648" stroke="#7e9dad" strokeWidth="6"/>
-              <circle cx="220" cy="81" r="22" fill="#274b60" stroke="#a3c1cf" strokeWidth="2"/>
-              <circle cx="220" cy="81" r="6" fill="#d8e8ee"/>
-              <path d="M198 81 A22 22 0 0 1 242 81" fill="none" stroke="#d4e4ea" strokeWidth="3" strokeLinecap="round"/>
-              <path d="M202 83 V173 Q202 180 195 180 H170 V202 M238 83 V143 Q238 150 245 150 H270 V216" fill="none" stroke="#d9e9ee" strokeWidth="3"/>
-              <rect x="142" y="202" width="56" height="62" rx="7" fill="url(#block)" stroke="#a0f2df" strokeWidth="2"/>
-              <rect x="247" y="216" width="56" height="76" rx="7" fill="#ffb86b" stroke="#ffe0ae" strokeWidth="2"/>
-              <path d="M151 213 H189 M256 227 H294" stroke="#fff" strokeWidth="2" opacity=".35"/>
-              <text x="170" y="237" fill="#effffb" textAnchor="middle" fontSize="17" fontWeight="700">m₁</text>
-              <text x="275" y="255" fill="#51351b" textAnchor="middle" fontSize="17" fontWeight="700">m₂</text>
-              <path d="M170 273 V287 M275 301 V312" stroke="#6e91a4" strokeWidth="2" strokeDasharray="3 4"/>
-              <g transform="translate(316 125)"><rect width="94" height="42" rx="10" fill="#132f40" stroke="#2b4e60"/><text x="47" y="17" fill="#8caebf" textAnchor="middle" fontSize="9" letterSpacing="1">ACCELERATION</text><text x="47" y="32" fill="#5be1bf" textAnchor="middle" fontSize="13" fontWeight="700">a = F / m</text></g>
-              <g transform="translate(22 119)"><rect width="94" height="42" rx="10" fill="#132f40" stroke="#2b4e60"/><text x="47" y="17" fill="#8caebf" textAnchor="middle" fontSize="9" letterSpacing="1">GRAVITY</text><text x="47" y="32" fill="#ffbe78" textAnchor="middle" fontSize="13" fontWeight="700">g = 9.81</text></g>
-              <circle cx="355" cy="230" r="3" fill="#5be1bf"/><circle cx="74" cy="220" r="4" fill="#ffbe78"/><circle cx="348" cy="61" r="3" fill="#5be1bf"/>
-            </svg>
-            <div className="art-label label-bottom"><span>01</span> NEWTON'S LAWS IN ACTION</div>
-          </div>
+    {page === 'welcome' && <main className="pl-welcome">
+      <section className="pl-welcome-copy">
+        <div className="pl-eyebrow"><span>✳</span> YOUR VIRTUAL PHYSICS LABORATORY</div>
+        <h1>Don't just learn<br />Physics. <em>Explore it.</em></h1>
+        <p>Change the variables. Run the experiment. See what happens. A hands-on A-level Physics space, built for learners everywhere — including right here in Uganda.</p>
+        <button className="pl-primary" onClick={() => setPage('dashboard')}>Enter Virtual Lab <span>↗</span></button>
+        <div className="pl-trust"><span>✓</span> Free to use <span>·</span> Works on mobile <span>·</span> Learn at your pace</div>
+      </section>
+      <section className="pl-welcome-art" aria-label="Physics laboratory illustration">
+        <div className="pl-art-orbit orbit-a" /><div className="pl-art-orbit orbit-b" />
+        <div className="pl-art-chip chip-one">F = ma</div><div className="pl-art-chip chip-two">E = kQ/r²</div>
+        <div className="pl-art-center"><div className="pl-orbit-ring ring-one" /><div className="pl-orbit-ring ring-two" /><div className="pl-atom-core">P<span>+</span></div><i className="pl-electron electron-one" /><i className="pl-electron electron-two" /></div>
+        <div className="pl-art-caption"><span className="pl-live-dot" /> EXPERIMENTS THAT RESPOND TO YOU</div>
+      </section>
+      <section className="pl-welcome-bottom"><div><strong>03</strong><span>Core topic areas</span></div><div><strong>10+</strong><span>Investigations to explore</span></div><div><strong>∞</strong><span>Ways to experiment</span></div><span className="pl-bottom-note">MADE FOR CURIOUS MINDS</span></section>
+    </main>}
+
+    {page === 'dashboard' && <main className="pl-dashboard">
+      <div className="pl-page-heading"><div><div className="pl-eyebrow">YOUR LEARNING SPACE</div><h1>Welcome to the lab<span>.</span></h1><p>Pick a topic, choose an experiment, and discover the physics for yourself.</p></div><div className="pl-status-card"><span className="pl-status-icon">✳</span><div><strong>Your lab is ready</strong><small>Choose any experiment to begin</small></div></div></div>
+      <section className="pl-progress-strip"><div className="pl-progress-symbol">◎</div><div className="pl-progress-copy"><strong>Your exploration journey</strong><span>Start with any topic — your observations will be collected as you go.</span></div><div className="pl-progress-count"><strong>{observations.length}</strong><span>observations saved</span></div></section>
+      <div className="pl-section-heading"><div><span className="pl-eyebrow">THE LABORATORY</span><h2>Explore a topic</h2></div><span className="pl-section-hint">3 TOPICS · A-LEVEL PHYSICS</span></div>
+      <section className="pl-topic-grid">{topics.map(item => <article className={`pl-topic-card ${item.color}`} key={item.id}>
+        <div className="pl-topic-card-top"><span className="pl-topic-number">{item.number} / TOPIC</span><span className="pl-topic-icon">{item.icon}</span></div>
+        <h3>{item.title}</h3><p>{item.subtitle}</p><div className="pl-topic-divider" /><div className="pl-topic-card-foot"><span>{item.count}</span><button onClick={() => openTopic(item.id)}>Explore topic <span>↗</span></button></div>
+        <div className="pl-card-decoration" aria-hidden="true">{item.id === 'mechanics' ? '↗' : item.id === 'electrostatics' ? '⊕' : '⟳'}</div>
+      </article>)}</section>
+      <section className="pl-quick-start"><div><span className="pl-eyebrow">NOT SURE WHERE TO START?</span><h2>Start with a simple experiment.</h2><p>Try changing two hanging masses and watch how the acceleration changes.</p></div><button className="pl-secondary" onClick={() => openTopic('mechanics')}>Open mechanics <span>→</span></button></section>
+    </main>}
+
+    {page === 'topic' && <main className="pl-workspace">
+      <div className="pl-breadcrumb"><button onClick={() => setPage('dashboard')}>Dashboard</button><span>/</span><span>{topic.title}</span></div>
+      <div className="pl-workspace-heading"><div><div className="pl-eyebrow">TOPIC {topic.number}</div><h1>{topic.title}<span>.</span></h1><p>{topic.subtitle}. Adjust the controls and record what you discover.</p></div><button className="pl-secondary" onClick={() => setPage('dashboard')}>← All topics</button></div>
+      <div className="pl-workspace-layout">
+        <aside className="pl-experiment-list"><div className="pl-aside-heading"><strong>Investigations</strong><span>{topic.experiments.length} EXPERIMENTS</span></div>{topic.experiments.map((item, index) => <button key={item.id} className={experiment === item.id ? 'pl-experiment-link active' : 'pl-experiment-link'} onClick={() => setExperiment(item.id)}><span className="pl-experiment-index">0{index + 1}</span><span className="pl-experiment-info"><strong>{item.title}</strong><small>{item.detail}</small></span><span className="pl-experiment-arrow">›</span></button>)}<div className="pl-aside-tip"><span>✦</span><div><strong>Think like a scientist</strong><p>Change one variable at a time. Predict first, then compare with your results.</p></div></div></aside>
+        <section className="pl-lab-panel"><div className="pl-lab-panel-head"><div><span className="pl-live-dot" /> INTERACTIVE SIMULATION</div><button onClick={() => setObservations([])}>Clear observations</button></div>
+          <div className="pl-sim-title"><div><span className="pl-eyebrow">{topic.title.toUpperCase()}</span><h2>{currentExperiment.title}</h2><p>{currentExperiment.detail}</p></div><span className={`pl-sim-icon ${topic.color}`}>{topic.icon}</span></div>
+          {topicId === 'mechanics' && experiment === 'atwood' && <div className="pl-sim-content"><div className="pl-visual-stage"><svg viewBox="0 0 500 230" role="img" aria-label="Interactive Atwood pulley system"><path d="M90 30 H410" stroke="#526d7b" strokeWidth="8" strokeLinecap="round"/><circle cx="250" cy="45" r="30" fill="#1a3544" stroke="#89a6b4" strokeWidth="5"/><circle cx="250" cy="45" r="5" fill="#d8f4ef"/><path d="M220 45 V150 M280 45 V105" stroke="#8db2bd" strokeWidth="3"/><path d="M220 45 A30 30 0 0 1 280 45" fill="none" stroke="#8db2bd" strokeWidth="3"/><rect x="192" y="150" width="56" height={Math.min(48, massA * 9)} rx="7" fill="#68dfbd"/><rect x="252" y="105" width="56" height={Math.min(78, massB * 15)} rx="7" fill="#aa9aff"/><text x="220" y="177" fill="#07131f" textAnchor="middle" fontSize="14" fontWeight="700">m₁</text><text x="280" y="132" fill="#07131f" textAnchor="middle" fontSize="14" fontWeight="700">m₂</text><text x="220" y="210" fill="#b9cbd3" textAnchor="middle" fontSize="13">{massA} kg</text><text x="280" y="210" fill="#b9cbd3" textAnchor="middle" fontSize="13">{massB} kg</text><path d={massB >= massA ? "M340 90 V145 l-7 -10 M340 145 l7 -10" : "M340 145 V90 l-7 10 M340 90 l7 10"} stroke="#68dfbd" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/><text x="365" y="120" fill="#68dfbd" fontSize="12">{massB >= massA ? 'Moves down' : 'Moves up'}</text></svg></div><div className="pl-controls-grid"><label>Mass 1 <strong>{massA.toFixed(1)} kg</strong><input type="range" min="0.5" max="8" step="0.5" value={massA} onChange={e => setMassA(Number(e.target.value))}/></label><label>Mass 2 <strong>{massB.toFixed(1)} kg</strong><input type="range" min="0.5" max="8" step="0.5" value={massB} onChange={e => setMassB(Number(e.target.value))}/></label></div><div className="pl-results-grid"><div><span>Acceleration</span><strong>{acceleration.toFixed(2)} <small>m/s²</small></strong></div><div><span>String tension</span><strong>{tension.toFixed(2)} <small>N</small></strong></div><div><span>Direction</span><strong>{massA === massB ? 'Balanced' : massB > massA ? 'Mass 2 ↓' : 'Mass 1 ↓'}</strong></div></div><div className="pl-formula-note"><strong>Model</strong><span>a = (m₂ − m₁)g / (m₁ + m₂)</span><small>Assumes a light string, frictionless pulley and g = 9.81 m/s².</small></div></div>}
+          {topicId === 'mechanics' && experiment === 'projectile' && <div className="pl-sim-content"><div className="pl-visual-stage"><svg viewBox="0 0 500 230" role="img" aria-label="Projectile trajectory"><path d="M30 190 H475" stroke="#526d7b" strokeWidth="2"/><path d={`M55 190 Q ${55 + projectileRange * 9} ${Math.max(30, 190 - Math.min(150, launchSpeed * Math.sin(angle * Math.PI / 180) * 7))} ${Math.min(465, 55 + projectileRange * 18)} 190`} stroke="#68dfbd" strokeWidth="3" fill="none" strokeDasharray="6 5"/><circle cx="55" cy="190" r="7" fill="#68dfbd"/><text x="32" y="215" fill="#b9cbd3" fontSize="12">Launch</text><text x="360" y="215" fill="#b9cbd3" fontSize="12">Horizontal range →</text></svg></div><div className="pl-controls-grid"><label>Launch speed <strong>{launchSpeed} m/s</strong><input type="range" min="4" max="25" step="1" value={launchSpeed} onChange={e => setLaunchSpeed(Number(e.target.value))}/></label><label>Launch angle <strong>{angle}°</strong><input type="range" min="10" max="80" step="5" value={angle} onChange={e => setAngle(Number(e.target.value))}/></label></div><div className="pl-results-grid"><div><span>Horizontal range</span><strong>{projectileRange.toFixed(2)} <small>m</small></strong></div><div><span>Flight time</span><strong>{flightTime.toFixed(2)} <small>s</small></strong></div><div><span>Initial speed</span><strong>{launchSpeed} <small>m/s</small></strong></div></div><div className="pl-formula-note"><strong>Model</strong><span>R = u² sin(2θ) / g</span><small>Ideal projectile launched and landing at the same height; air resistance ignored.</small></div></div>}
+          {topicId === 'mechanics' && experiment === 'freefall' && <div className="pl-sim-content"><div className="pl-visual-stage pl-simple-stage"><span className="pl-fall-ball">●</span><span className="pl-ground-line" /><span className="pl-height-label">{height.toFixed(1)} m</span></div><div className="pl-controls-grid"><label>Drop height <strong>{height.toFixed(1)} m</strong><input type="range" min="0.5" max="20" step="0.5" value={height} onChange={e => setHeight(Number(e.target.value))}/></label><div className="pl-reading-card"><span>Fall time (ideal)</span><strong>{Math.sqrt(2 * height / 9.81).toFixed(2)} s</strong></div></div><div className="pl-formula-note"><strong>Model</strong><span>h = ½gt²</span><small>Assumes the object starts from rest and air resistance is negligible.</small></div></div>}
+          {topicId === 'electrostatics' && <div className="pl-sim-content"><div className="pl-charge-stage"><div className={`pl-charge charge-a ${chargeA >= 0 ? 'positive' : 'negative'}`}>{chargeA > 0 ? '+' : '−'}<small>{Math.abs(chargeA)} μC</small></div><div className="pl-field-lines">{Array.from({length:5},(_,i)=><i key={i} style={{transform:`rotate(${(i-2)*14}deg)`}} />)}</div><div className={`pl-charge charge-b ${chargeB >= 0 ? 'positive' : 'negative'}`}>{chargeB > 0 ? '+' : '−'}<small>{Math.abs(chargeB)} μC</small></div><span className="pl-distance-label">{distance.toFixed(2)} m apart</span></div><div className="pl-controls-grid"><label>Charge 1 <strong>{chargeA} μC</strong><input type="range" min="-8" max="8" step="1" value={chargeA} onChange={e => setChargeA(Number(e.target.value) || 1)}/></label><label>Charge 2 <strong>{chargeB} μC</strong><input type="range" min="-8" max="8" step="1" value={chargeB} onChange={e => setChargeB(Number(e.target.value) || -1)}/></label><label className="pl-wide-control">Separation <strong>{distance.toFixed(2)} m</strong><input type="range" min="0.2" max="2" step="0.1" value={distance} onChange={e => setDistance(Number(e.target.value))}/></label></div><div className="pl-results-grid"><div><span>Force magnitude</span><strong>{coulombForce.toFixed(3)} <small>N</small></strong></div><div><span>Interaction</span><strong>{chargeA * chargeB < 0 ? 'Attraction' : 'Repulsion'}</strong></div><div><span>Charge product</span><strong>{chargeA * chargeB > 0 ? 'Positive' : 'Negative'}</strong></div></div><div className="pl-formula-note"><strong>Coulomb's law</strong><span>F = k |q₁q₂| / r²</span><small>Charges are in μC; k ≈ 8.99 × 10⁹ N m²/C². The display is a simplified illustration.</small></div>{experiment !== 'coulomb' && <p className="pl-context-note">{experiment === 'fields' ? 'Compare the signs of the charges: field direction and shape depend on the charge arrangement.' : 'Electric potential from a point charge varies with charge and distance: V = kQ/r.'}</p>}</div>}
+          {topicId === 'circular' && <div className="pl-sim-content"><div className="pl-visual-stage pl-circle-stage"><svg viewBox="0 0 500 230" role="img" aria-label="Object moving in a circular path"><circle cx="240" cy="112" r={Math.min(76, 32 + radius * 15)} fill="none" stroke="#506b7b" strokeWidth="2" strokeDasharray="7 7"/><line x1="240" y1="112" x2={240 + Math.min(76,32 + radius * 15)} y2="112" stroke="#f1bd69" strokeWidth="2"/><circle cx="240" cy="112" r="7" fill="#d9e8ed"/><circle cx={240 + Math.min(76,32 + radius * 15)} cy="112" r="13" fill="#f1bd69"/><path d={`M${240 + Math.min(76,32 + radius * 15)} 112 l-20 -8 m20 8 l-9 18`} stroke="#68dfbd" strokeWidth="3" fill="none" strokeLinecap="round"/><text x="240" y="218" textAnchor="middle" fill="#b9cbd3" fontSize="12">Inward acceleration points to the centre</text></svg></div><div className="pl-controls-grid"><label>Speed <strong>{speed.toFixed(1)} m/s</strong><input type="range" min="0.5" max="12" step="0.5" value={speed} onChange={e => setSpeed(Number(e.target.value))}/></label><label>Radius <strong>{radius.toFixed(1)} m</strong><input type="range" min="0.5" max="5" step="0.5" value={radius} onChange={e => setRadius(Number(e.target.value))}/></label><label className="pl-wide-control">Rotating mass <strong>{rotatingMass.toFixed(1)} kg</strong><input type="range" min="0.1" max="5" step="0.1" value={rotatingMass} onChange={e => setRotatingMass(Number(e.target.value))}/></label></div><div className="pl-results-grid"><div><span>Centripetal acceleration</span><strong>{centripetalAcceleration.toFixed(2)} <small>m/s²</small></strong></div><div><span>Centripetal force</span><strong>{centripetalForce.toFixed(2)} <small>N</small></strong></div><div><span>Angular speed</span><strong>{(speed / radius).toFixed(2)} <small>rad/s</small></strong></div></div><div className="pl-formula-note"><strong>Circular motion</strong><span>a = v²/r · F = mv²/r</span><small>Try doubling the speed. Notice how much more rapidly the required inward force increases.</small></div>{experiment === 'period' && <p className="pl-context-note">Period T = 2πr/v = {(2 * Math.PI * radius / speed).toFixed(2)} s; frequency f = {(speed / (2 * Math.PI * radius)).toFixed(2)} Hz.</p>}{experiment === 'orbit' && <p className="pl-context-note">For a stable circular orbit, gravity supplies the centripetal force. This model illustrates the circular-motion relationship, not a full orbital gravity solver.</p>}</div>}
+          <div className="pl-observation-action"><div><strong>Record your result</strong><span>Save the current readings to your observation notebook.</span></div><button className="pl-primary pl-record-btn" onClick={addObservation}>＋ Record observation</button></div>
+          {observations.length > 0 && <section className="pl-notebook"><div className="pl-notebook-head"><div><span className="pl-eyebrow">YOUR LAB NOTEBOOK</span><h3>Saved observations</h3></div><span>{observations.length} saved</span></div>{observations.map((item,i)=><div className="pl-observation" key={i}><span>0{i+1}</span><p>{item}</p></div>)}</section>}
         </section>
-
-        <section className="stats-strip" aria-label="Platform features">
-          <div><span className="stat-icon">◉</span><span><b>Made for UACE</b><small>Aligned to A-level learning</small></span></div>
-          <div><span className="stat-icon">↗</span><span><b>Learn by doing</b><small>Change values, see results</small></span></div>
-          <div><span className="stat-icon">⌁</span><span><b>Phone-friendly</b><small>Lightweight and accessible</small></span></div>
-          <div><span className="stat-icon">♡</span><span><b>Always free</b><small>Knowledge for everyone</small></span></div>
-        </section>
-
-        <section className="lab-section" id="lab">
-          <div className="section-heading"><div><div className="eyebrow">THE EXPERIMENT ROOM</div><h2>Step inside the <em>virtual lab.</em></h2></div><span className="live-tag"><i /> LAB READY</span></div>
-          <div className="lab-layout">
-            <aside className="experiment-list" id="experiments">
-              <div className="list-caption">CHOOSE AN EXPERIMENT</div>
-              <button className={experiment === 'atwood' ? 'experiment-option selected' : 'experiment-option'} onClick={() => setExperiment('atwood')}><span className="experiment-icon pulley">⚖</span><span><b>Atwood machine</b><small>Forces & acceleration</small></span><span className="option-arrow">↗</span></button>
-              <button className={experiment === 'projectile' ? 'experiment-option selected' : 'experiment-option'} onClick={() => setExperiment('projectile')}><span className="experiment-icon projectile">➶</span><span><b>Projectile motion</b><small>Motion in 2D</small></span><span className="soon">SOON</span></button>
-              <button className={experiment === 'ohm' ? 'experiment-option selected' : 'experiment-option'} onClick={() => setExperiment('ohm')}><span className="experiment-icon circuit">ϟ</span><span><b>Ohm's law</b><small>Electric circuits</small></span><span className="soon">SOON</span></button>
-              <div className="syllabus-note"><span>✦</span><p><b>Built for your syllabus</b><br />More UACE experiments are on the way.</p></div>
-            </aside>
-
-            <div className="simulation-panel">
-              {experiment === 'atwood' ? <>
-                <div className="sim-top"><div><span className="sim-number">EXPERIMENT 01</span><h3>Atwood machine</h3><p>Investigate how mass affects acceleration.</p></div><span className="interactive-tag">● INTERACTIVE</span></div>
-                <div className="sim-canvas">
-                  <div className="canvas-grid" />
-                  <svg viewBox="0 0 520 260" className="machine-svg" role="img" aria-label="Atwood machine with two hanging masses">
-                    <defs><linearGradient id="weightA" x1="0" x2="1"><stop stopColor="#20b99f"/><stop offset="1" stopColor="#58e1c0"/></linearGradient><linearGradient id="weightB" x1="0" x2="1"><stop stopColor="#e79a4f"/><stop offset="1" stopColor="#ffd096"/></linearGradient></defs>
-                    <path d="M90 224 V39 Q90 29 100 29 H420 Q430 29 430 39 V224" fill="none" stroke="#2e4b5c" strokeWidth="7" strokeLinecap="round"/>
-                    <path d="M97 224 V40 Q97 36 103 36 H417 Q423 36 423 40 V224" fill="none" stroke="#557486" strokeWidth="1.5"/>
-                    <path d="M110 36 H410" stroke="#8da9b8" strokeWidth="6" strokeLinecap="round"/>
-                    <circle cx="260" cy="54" r="23" fill="#183648" stroke="#87a7b7" strokeWidth="4"/><circle cx="260" cy="54" r="16" fill="#294b5e" stroke="#c0d4de" strokeWidth="1.5"/><circle cx="260" cy="54" r="4" fill="#d8e8ee"/>
-                    <path d={`M244 54 V${Math.max(82, 122 - displacement * 22)} Q244 ${Math.max(82, 122 - displacement * 22) + 4} 237 ${Math.max(82, 122 - displacement * 22) + 4} H${205}`} fill="none" stroke="#d7e5eb" strokeWidth="2.5"/>
-                    <path d={`M276 54 V${Math.min(170, 118 + displacement * 22)} Q276 ${Math.min(170, 118 + displacement * 22) + 4} 283 ${Math.min(170, 118 + displacement * 22) + 4} H315`} fill="none" stroke="#d7e5eb" strokeWidth="2.5"/>
-                    <rect x="158" y={Math.max(126, 158 - displacement * 22)} width="54" height="54" rx="6" fill="url(#weightA)" stroke="#a2f4df" strokeWidth="1.5"/><text x="185" y={Math.max(126, 158 - displacement * 22) + 31} textAnchor="middle" fill="#073b36" fontSize="16" fontWeight="700">m₁</text>
-                    <rect x="308" y={Math.min(172, 154 + displacement * 22)} width="54" height="54" rx="6" fill="url(#weightB)" stroke="#ffe0b2" strokeWidth="1.5"/><text x="335" y={Math.min(172, 154 + displacement * 22) + 31} textAnchor="middle" fill="#573718" fontSize="16" fontWeight="700">m₂</text>
-                    <path d="M185 192 V224 M335 226 V238" stroke="#456779" strokeWidth="1.5" strokeDasharray="4 4"/>
-                    <text x="185" y="244" textAnchor="middle" fill="#8da9b8" fontSize="11">{massA.toFixed(1)} kg</text><text x="335" y="244" textAnchor="middle" fill="#8da9b8" fontSize="11">{massB.toFixed(1)} kg</text>
-                    {running && <g><circle cx="260" cy="54" r="31" fill="none" stroke="#5be1bf" strokeWidth="1.5" strokeDasharray="4 5"/><text x="260" y="14" textAnchor="middle" fill="#5be1bf" fontSize="10">RUNNING</text></g>}
-                  </svg>
-                  <div className="canvas-caption"><span><i /> LIVE MODEL</span><span>Ideal pulley · negligible friction</span></div>
-                </div>
-                <div className="controls">
-                  <div className="control-row"><div><label htmlFor="mass-a">Mass 1 <span className="mass-color green" /></label><small>Left-hand side</small></div><div className="slider-control"><input id="mass-a" type="range" min="1" max="10" step=".5" value={massA} onChange={e => {setMassA(Number(e.target.value)); reset()}}/><output>{massA.toFixed(1)} <small>kg</small></output></div></div>
-                  <div className="control-row"><div><label htmlFor="mass-b">Mass 2 <span className="mass-color orange" /></label><small>Right-hand side</small></div><div className="slider-control"><input id="mass-b" type="range" min="1" max="10" step=".5" value={massB} onChange={e => {setMassB(Number(e.target.value)); reset()}}/><output>{massB.toFixed(1)} <small>kg</small></output></div></div>
-                  <div className="sim-actions"><button className="run-btn" onClick={() => { if (running) { setRunning(false) } else { setTime(t => t + 1); setRunning(true) } }}>{running ? 'Ⅱ Pause experiment' : '▶ Run experiment'}</button><button className="reset-btn" onClick={reset}>↺ Reset</button><span className="time-readout">t = {time.toFixed(1)} s</span></div>
-                </div>
-                <div className="results">
-                  <div className="result-heading"><span>MEASURED RESULTS</span><span>Calculated from Newton's 2nd law</span></div>
-                  <div className="result-cards"><div className="result-card"><small>Acceleration, |a|</small><strong>{Math.abs(acceleration).toFixed(2)} <i>m/s²</i></strong><span>{massA === massB ? 'Balanced masses' : (massB > massA ? 'm₂ moves down ↓' : 'm₁ moves down ↓')}</span></div><div className="result-card"><small>String tension, T</small><strong>{tension.toFixed(2)} <i>N</i></strong><span>Assuming a light string</span></div><div className="result-card"><small>Weight difference</small><strong>{(Math.abs(massB - massA) * 9.81).toFixed(2)} <i>N</i></strong><span>Driving force</span></div></div>
-                  <div className="formula-box"><span>THEORY</span><code>|a| = |m₂ − m₁|g / (m₁ + m₂)</code><span className="formula-note">g = 9.81 m/s²</span></div>
-                </div>
-              </> : <div className="coming-panel"><span className="coming-icon">{experiment === 'projectile' ? '➶' : 'ϟ'}</span><span className="sim-number">COMING NEXT</span><h3>{experiment === 'projectile' ? 'Projectile motion' : "Ohm's law"}</h3><p>{experiment === 'projectile' ? 'Explore launch angle, initial speed, flight time and range.' : 'Change voltage and resistance to investigate current and resistance.'}</p><button className="reset-btn" onClick={() => setExperiment('atwood')}>Back to Atwood machine</button></div>}
-            </div>
-          </div>
-        </section>
-
-        <section className="learning-section" id="about"><div><div className="eyebrow">SCIENCE SHOULD BE FOR EVERYONE</div><h2>Understand the <em>why.</em><br />Not just the formula.</h2></div><p>PhysicsLab UG is being built to make practical Physics easier to explore, even when you don't have lab equipment or fast internet. Start with one variable, observe what changes, and build your understanding.</p></section>
-      </main>
-      <footer><a className="brand footer-brand" href="#"><span className="brand-mark">P<span>+</span></span><span>PhysicsLab <b>UG</b><small>LEARN BY EXPERIMENTING</small></span></a><span>Made for curious minds in Uganda 🇺🇬</span><span>Free to explore · Built for learning</span></footer>
-    </div>
-  )
+      </div>
+      <footer className="pl-workspace-footer">PHYSICSLAB UG <span>•</span> Explore. Measure. Understand.</footer>
+    </main>}
+    <footer className="pl-footer"><span>© PhysicsLab UG</span><span>Made for curious minds in Uganda <i>✳</i></span></footer>
+  </div>
 }
 
 export default App
