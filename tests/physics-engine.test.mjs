@@ -78,3 +78,52 @@ test('Coulomb force handles attraction, repulsion, and neutral charges', () => {
   near(neutral.magnitude, 0)
   assert.equal(neutral.type, 'no-force')
 })
+
+
+test('world applies Newton second law and advances deterministically', () => {
+  const body = createBody({
+    id: 'cart',
+    mass: 2,
+    position: { x: 0, y: 0 },
+    velocity: { x: 0, y: 0 },
+  })
+  const world = createWorld([body], { x: 0, y: 0 })
+  const moved = stepWorld(applyForce(world, 'cart', { x: 10, y: 0 }), 0.1)
+  near(moved.bodies[0].velocity.x, 0.5)
+  near(moved.bodies[0].position.x, 0.05)
+  near(moved.time, 0.1)
+  near(world.bodies[0].position.x, 0)
+})
+
+test('world applies gravity and clears one-step applied forces', () => {
+  const body = createBody({
+    id: 'drop',
+    mass: 1,
+    position: { x: 0, y: 10 },
+    velocity: { x: 0, y: 0 },
+  })
+  const world = createWorld([body])
+  const afterOne = stepWorld(world, 0.1)
+  near(afterOne.bodies[0].velocity.y, -0.981)
+  near(afterOne.bodies[0].position.y, 9.9019)
+  near(afterOne.bodies[0].force.x, 0)
+  const afterTwo = stepWorld(afterOne, 0.1)
+  near(afterTwo.bodies[0].velocity.y, -1.962)
+})
+
+test('world keeps fixed anchors immobile and rejects invalid steps', () => {
+  const anchor = createBody({
+    id: 'anchor',
+    mass: 1,
+    position: { x: 3, y: 4 },
+    velocity: { x: 5, y: 6 },
+    fixed: true,
+  })
+  const world = createWorld([anchor])
+  const after = stepWorld(world, 0.1)
+  near(after.bodies[0].position.x, 3)
+  near(after.bodies[0].position.y, 4)
+  near(after.bodies[0].velocity.x, 0)
+  assert.throws(() => stepWorld(world, 0), /positive/)
+  assert.throws(() => createWorld([anchor, anchor]), /Duplicate/)
+})
