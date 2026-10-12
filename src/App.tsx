@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import PulleyWorkshop from './PulleyWorkshop'
+import { solveAtwood, solveCircularMotion, solveCoulombForce } from './physics/engine'
 import ProjectileLab from './ProjectileLab'
 import InclinedPlaneLab from './InclinedPlaneLab'
 import PendulumLab from './PendulumLab'
@@ -46,11 +47,14 @@ function App() {
   const topic = topics.find(item => item.id === topicId) ?? topics[0]
   const currentExperiment = topic.experiments.find(item => item.id === experiment) ?? topic.experiments[0]
 
-  const acceleration = useMemo(() => ((massB - massA) * 9.81) / (massA + massB), [massA, massB])
-  const tension = useMemo(() => (2 * massA * massB * 9.81) / (massA + massB), [massA, massB])
-  const coulombForce = useMemo(() => 8.99e9 * Math.abs(chargeA * 1e-6 * chargeB * 1e-6) / (distance * distance), [chargeA, chargeB, distance])
-  const centripetalAcceleration = speed * speed / radius
-  const centripetalForce = rotatingMass * centripetalAcceleration
+  const atwoodModel = useMemo(() => solveAtwood(massA, massB), [massA, massB])
+  const acceleration = atwoodModel.acceleration
+  const tension = atwoodModel.tension
+  const coulombModel = useMemo(() => solveCoulombForce(chargeA, chargeB, distance), [chargeA, chargeB, distance])
+  const coulombForce = coulombModel.magnitude
+  const circularModel = solveCircularMotion(rotatingMass, speed, radius)
+  const centripetalAcceleration = circularModel.acceleration
+  const centripetalForce = circularModel.centripetalForce
   const openTopic = (id: TopicId) => {
     const selected = topics.find(item => item.id === id) ?? topics[0]
     setTopicId(id)
@@ -63,7 +67,7 @@ function App() {
         : experiment === 'projectile' || experiment === 'inclined' || experiment === 'pendulum' ? (labSummary || `${currentExperiment.title}: change a control to calculate the result.`)
         : `Free fall from ${height.toFixed(1)} m: ideal fall time ≈ ${Math.sqrt(2 * height / 9.81).toFixed(2)} s.`
       : topicId === 'electrostatics'
-        ? experiment === 'coulomb' ? `Coulomb: force ≈ ${coulombForce.toFixed(3)} N; charges are ${chargeA * chargeB < 0 ? 'attractive' : 'repulsive'} at ${distance.toFixed(2)} m.` : `Field exploration: q₁ = ${chargeA} μC, q₂ = ${chargeB} μC, separation = ${distance.toFixed(2)} m.`
+        ? experiment === 'coulomb' ? `Coulomb: force ≈ ${coulombForce.toFixed(3)} N; charges are ${coulombModel.type} at ${distance.toFixed(2)} m.` : `Field exploration: q₁ = ${chargeA} μC, q₂ = ${chargeB} μC, separation = ${distance.toFixed(2)} m.`
         : `Circular motion: aᶜ = ${centripetalAcceleration.toFixed(2)} m/s², Fᶜ = ${centripetalForce.toFixed(2)} N at v=${speed} m/s, r=${radius} m.`
     setObservations(prev => [value, ...prev].slice(0, 8))
   }
