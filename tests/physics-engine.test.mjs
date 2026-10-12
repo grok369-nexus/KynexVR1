@@ -21,7 +21,7 @@ test('Atwood machine returns signed acceleration and correct tension', () => {
   const model = solveAtwood(2, 4)
   assert.equal(model.valid, true)
   near(model.acceleration, 3.27)
-  near(model.tension, 13.08)
+  near(model.tension, 26.16)
 })
 
 test('equal Atwood masses have zero acceleration and non-zero tension', () => {
