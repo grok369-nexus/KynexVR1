@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { solveInclinedPlane } from './physics/engine'
 
 export default function InclinedPlaneLab({ onSummaryChange }: { onSummaryChange?: (summary: string) => void }) {
   const [mass, setMass] = useState(5)
@@ -7,22 +8,8 @@ export default function InclinedPlaneLab({ onSummaryChange }: { onSummaryChange?
   const [muKinetic, setMuKinetic] = useState(0.25)
   const [gravity, setGravity] = useState(9.81)
 
-  const result = useMemo(() => {
-    const radians = angle * Math.PI / 180
-    const weight = mass * gravity
-    const parallel = weight * Math.sin(radians)
-    const normal = weight * Math.cos(radians)
-    const maximumStatic = muStatic * normal
-    const staysAtRest = parallel <= maximumStatic
-    const friction = staysAtRest ? parallel : muKinetic * normal
-    const netDownSlope = staysAtRest ? 0 : parallel - friction
-    return {
-      weight, parallel, normal, friction, netDownSlope,
-      acceleration: netDownSlope / mass,
-      staysAtRest,
-      maximumStatic,
-    }
-  }, [mass, angle, muStatic, muKinetic, gravity])
+  const result = useMemo(() => solveInclinedPlane(mass, angle, muStatic, muKinetic, gravity), [mass, angle, muStatic, muKinetic, gravity])
+  const normal = result.normalReaction
 
   const radians = angle * Math.PI / 180
   const blockX = 45 + 165 * Math.cos(radians)
