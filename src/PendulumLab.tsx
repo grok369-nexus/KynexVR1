@@ -28,8 +28,8 @@ export default function PendulumLab({ onSummaryChange }: { onSummaryChange?: (su
   const bobX = pivotX + radius * Math.sin(angleNow)
   const bobY = pivotY + radius * Math.cos(angleNow)
   const leftX = pivotX - radius * Math.sin(model.initialAngleRadians)
-  const rightX = pivotX + radius * Math.sin(model.theta0)
-  useEffect(() => { onSummaryChange?.(`Simple pendulum: period ${model.period.toFixed(3)} s, frequency ${model.frequency.toFixed(3)} Hz, maximum speed ${model.maxSpeed.toFixed(2)} m/s; length ${length.toFixed(2)} m, gravity ${gravity.toFixed(2)} m/s².`) }, [onSummaryChange, model.period, model.frequency, model.maxSpeed, length, gravity])
+  const rightX = pivotX + radius * Math.sin(model.initialAngleRadians)
+  useEffect(() => { onSummaryChange?.(`Simple pendulum: period ${model.period.toFixed(3)} s, frequency ${model.frequency.toFixed(3)} Hz, maximum speed ${model.maximumSpeed.toFixed(2)} m/s; length ${length.toFixed(2)} m, gravity ${gravity.toFixed(2)} m/s².`) }, [onSummaryChange, model.period, model.frequency, model.maximumSpeed, length, gravity])
 
   return <div className="ph-lab">
     <div className="ph-sim-canvas">
@@ -39,7 +39,7 @@ export default function PendulumLab({ onSummaryChange }: { onSummaryChange?: (su
           <marker id="ph-pendulum-weight-arrow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#f1bd69" /></marker>
           <marker id="ph-pendulum-tension-arrow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7db7ff" /></marker>
         </defs>
-        <path d={`M ${leftX} ${pivotY + radius * Math.cos(model.theta0)} A ${radius} ${radius} 0 0 1 ${rightX} ${pivotY + radius * Math.cos(model.theta0)}`} fill="none" stroke="#365562" strokeWidth="2" strokeDasharray="5 5" />
+        <path d={`M ${leftX} ${pivotY + radius * Math.cos(model.initialAngleRadians)} A ${radius} ${radius} 0 0 1 ${rightX} ${pivotY + radius * Math.cos(model.initialAngleRadians)}`} fill="none" stroke="#365562" strokeWidth="2" strokeDasharray="5 5" />
         <line x1={pivotX} y1={pivotY} x2={pivotX} y2={pivotY + radius + 12} stroke="#547581" strokeDasharray="4 5" />
         <path d={`M ${pivotX - 20} ${pivotY} L ${pivotX + 20} ${pivotY} L ${pivotX} ${pivotY + 13} Z`} fill="#426573" stroke="#82a4af" />
         <line x1={pivotX} y1={pivotY} x2={bobX} y2={bobY} stroke="#b9d0d7" strokeWidth="3" strokeLinecap="round" />
@@ -69,7 +69,7 @@ export default function PendulumLab({ onSummaryChange }: { onSummaryChange?: (su
     <div className="ph-readouts">
       <div><span>Period</span><strong>{model.period.toFixed(3)} <small>s</small></strong></div>
       <div><span>Frequency</span><strong>{model.frequency.toFixed(3)} <small>Hz</small></strong></div>
-      <div><span>Maximum speed</span><strong>{model.maxSpeed.toFixed(2)} <small>m/s</small></strong></div>
+      <div><span>Maximum speed</span><strong>{model.maximumSpeed.toFixed(2)} <small>m/s</small></strong></div>
       <div><span>Tension now</span><strong>{currentTension.toFixed(2)} <small>N</small></strong></div>
     </div>
     <div className="ph-explanation">
