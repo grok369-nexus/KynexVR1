@@ -99,11 +99,28 @@ function App() {
         <button className="pl-primary" onClick={() => setPage('dashboard')}>Enter the research lab <span>↗</span></button>
         <div className="pl-trust"><span>✓</span> Free to use <span>·</span> Works on mobile <span>·</span> Learn at your pace</div>
       </section>
-      <section className="pl-welcome-art" aria-label="Physics laboratory illustration">
-        <div className="pl-art-orbit orbit-a" /><div className="pl-art-orbit orbit-b" />
-        <div className="pl-art-chip chip-one">F = ma</div><div className="pl-art-chip chip-two">E = kQ/r²</div>
-        <div className="pl-art-center"><div className="pl-orbit-ring ring-one" /><div className="pl-orbit-ring ring-two" /><div className="pl-atom-core">P<span>+</span></div><i className="pl-electron electron-one" /><i className="pl-electron electron-two" /></div>
-        <div className="pl-art-caption"><span className="pl-live-dot" /> EXPERIMENTS THAT RESPOND TO YOU</div>
+      <section className="pl-welcome-art" aria-label="Physics trajectory visualisation">
+        <div className="pl-art-meta"><span>MODEL 001</span><span>PROJECTILE MOTION</span><i>● LIVE MODEL</i></div>
+        <svg className="pl-trajectory-art" viewBox="0 0 620 430" role="img" aria-label="A projectile follows a curved path through a measured coordinate grid">
+          <defs>
+            <pattern id="physics-grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M 30 0 L 0 0 0 30" fill="none" stroke="#c7d0cc" strokeWidth="1"/></pattern>
+            <linearGradient id="trajectory-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#315cff" stopOpacity=".22"/><stop offset="100%" stopColor="#315cff" stopOpacity="0"/></linearGradient>
+          </defs>
+          <rect x="24" y="24" width="572" height="356" fill="url(#physics-grid)"/>
+          <path d="M70 340 H560 M70 340 V55" stroke="#303b39" strokeWidth="2" fill="none"/>
+          <path d="M550 332 L560 340 L550 348 M62 65 L70 55 L78 65" stroke="#303b39" strokeWidth="2" fill="none"/>
+          <path d="M92 320 Q290 -80 510 320 L92 320Z" fill="url(#trajectory-fill)"/>
+          <path d="M92 320 Q290 -80 510 320" stroke="#315cff" strokeWidth="5" strokeLinecap="round" fill="none"/>
+          <path d="M92 320 L170 220" stroke="#ff684d" strokeWidth="3" strokeDasharray="7 7"/>
+          <path d="M151 220 L170 220 L168 239" stroke="#ff684d" strokeWidth="3" fill="none"/>
+          <circle cx="92" cy="320" r="11" fill="#ff684d" stroke="#fffaf1" strokeWidth="5"/>
+          <circle cx="290" cy="120" r="11" fill="#315cff" stroke="#fffaf1" strokeWidth="5"/>
+          <circle cx="510" cy="320" r="11" fill="#ff684d" stroke="#fffaf1" strokeWidth="5"/>
+          <path d="M290 120 V340 M92 320 H290" stroke="#82918a" strokeWidth="1.5" strokeDasharray="5 6"/>
+          <g fill="#303b39" fontFamily="monospace" fontSize="13"><text x="80" y="365">0</text><text x="280" y="365">x</text><text x="40" y="126">y</text><text x="304" y="108">APEX</text><text x="122" y="250" fill="#ff684d">v₀</text><text x="404" y="286">RANGE →</text></g>
+          <g transform="translate(372 54)"><rect width="180" height="65" rx="2" fill="#fffaf1" stroke="#d5d8cf"/><text x="14" y="22" fontFamily="monospace" fontSize="10" fill="#727e77">VERTICAL MOTION</text><text x="14" y="47" fontFamily="monospace" fontSize="17" fill="#315cff">vᵧ = uᵧ − gt</text></g>
+        </svg>
+        <div className="pl-art-caption"><span className="pl-live-dot" /> CHANGE THE CONDITIONS. WATCH THE MODEL RESPOND.</div>
       </section>
       <section className="pl-welcome-bottom"><div><strong>03</strong><span>Core physics domains</span></div><div><strong>12</strong><span>Experiment pathways</span></div><div><strong>∞</strong><span>Hypotheses to test</span></div><span className="pl-bottom-note">MADE FOR CURIOUS MINDS</span></section>
     </main>}
