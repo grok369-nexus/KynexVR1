@@ -33,6 +33,7 @@ const topics: { id: TopicId; number: string; title: string; subtitle: string; ic
 
 function App() {
   const [page, setPage] = useState<Page>('welcome')
+  const [searchQuery, setSearchQuery] = useState('')
   const [topicId, setTopicId] = useState<TopicId>('mechanics')
   const [experiment, setExperiment] = useState<ExperimentId>('atwood')
   const [massA, setMassA] = useState(2)
@@ -57,11 +58,19 @@ function App() {
   const circularModel = solveCircularMotion(rotatingMass, speed, radius)
   const centripetalAcceleration = circularModel.acceleration
   const centripetalForce = circularModel.centripetalForce
-  const openTopic = (id: TopicId) => {
+  const matchingExperiments = topics.flatMap(item => item.experiments.map(exp => ({ ...exp, topicId: item.id, topicTitle: item.title, topicColor: item.color, topicNumber: item.number }))).filter(item => {
+    const query = searchQuery.trim().toLowerCase()
+    return !query || [item.title, item.detail, item.topicTitle].some(value => value.toLowerCase().includes(query))
+  })
+  const openTopic = (id: TopicId, requestedExperiment?: ExperimentId) => {
     const selected = topics.find(item => item.id === id) ?? topics[0]
     setTopicId(id)
-    setExperiment(selected.experiments[0].id)
+    setExperiment(requestedExperiment ?? selected.experiments[0].id)
     setPage('topic')
+  }
+  const openSearchResult = (id: TopicId, experimentId: ExperimentId) => {
+    openTopic(id, experimentId)
+    setSearchQuery('')
   }
   const addObservation = () => {
     const value = topicId === 'mechanics'
@@ -100,15 +109,18 @@ function App() {
     </main>}
 
     {page === 'dashboard' && <main className="pl-dashboard">
-      <div className="pl-page-heading"><div><div className="pl-eyebrow">YOUR LEARNING SPACE</div><h1>Welcome to the lab<span>.</span></h1><p>Pick a topic, choose an experiment, and discover the physics for yourself.</p></div><div className="pl-status-card"><span className="pl-status-icon">✳</span><div><strong>Your lab is ready</strong><small>Choose any experiment to begin</small></div></div></div>
-      <section className="pl-progress-strip"><div className="pl-progress-symbol">◎</div><div className="pl-progress-copy"><strong>Your exploration journey</strong><span>Start with any topic — your observations will be collected as you go.</span></div><div className="pl-progress-count"><strong>{observations.length}</strong><span>observations saved</span></div></section>
-      <div className="pl-section-heading"><div><span className="pl-eyebrow">THE LABORATORY</span><h2>Explore a topic</h2></div><span className="pl-section-hint">3 TOPICS · A-LEVEL PHYSICS</span></div>
+      <div className="pl-page-heading"><div><div className="pl-eyebrow"><span className="pl-live-dot" /> RESEARCH CONSOLE / UACE PHYSICS</div><h1>Enter the <em>unknown.</em></h1><p>Choose a system. Set its initial conditions. Let the laws of physics reveal what happens next.</p></div><div className="pl-status-card"><span className="pl-status-icon">⌁</span><div><strong>Simulation core online</strong><small>Deterministic models · SI units</small></div><span className="pl-status-pulse" /></div></div>
+      <section className="pl-command-search" aria-label="Find an experiment"><span className="pl-search-icon">⌕</span><input type="search" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Find a system… try projectile, charge, pendulum" aria-label="Search physics experiments" /><kbd>SEARCH LAB</kbd></section>
+      {searchQuery.trim() && <section className="pl-search-results"><div className="pl-search-results-head"><span className="pl-eyebrow">MATCHING SYSTEMS</span><span>{matchingExperiments.length} results</span></div>{matchingExperiments.length ? matchingExperiments.map(item => <button className="pl-search-result" key={item.id} onClick={() => openSearchResult(item.topicId, item.id)}><span className={`pl-result-topic-icon ${item.topicColor}`}>{item.topicId === 'mechanics' ? '↗' : item.topicId === 'electrostatics' ? '✳' : '⟳'}</span><span><strong>{item.title}</strong><small>{item.topicTitle} / {item.detail}</small></span><span className="pl-experiment-arrow">↗</span></button>) : <p className="pl-no-results">No matching system yet. Try another term, or explore the available topic areas below.</p>}</section>}
+      <section className="pl-progress-strip"><div className="pl-progress-symbol">◎</div><div className="pl-progress-copy"><strong>Field notebook</strong><span>Your observations stay in this session. Record measurements, compare outcomes, and build your own evidence.</span></div><div className="pl-progress-count"><strong>{observations.length}</strong><span>observations saved</span></div></section>
+      <div className="pl-section-heading"><div><span className="pl-eyebrow">01 — SELECT A DOMAIN</span><h2>Choose your system</h2></div><span className="pl-section-hint">A-LEVEL PHYSICS · OPEN ACCESS</span></div>
       <section className="pl-topic-grid">{topics.map(item => <article className={`pl-topic-card ${item.color}`} key={item.id}>
         <div className="pl-topic-card-top"><span className="pl-topic-number">{item.number} / TOPIC</span><span className="pl-topic-icon">{item.icon}</span></div>
         <h3>{item.title}</h3><p>{item.subtitle}</p><div className="pl-topic-divider" /><div className="pl-topic-card-foot"><span>{item.count}</span><button onClick={() => openTopic(item.id)}>Explore topic <span>↗</span></button></div>
         <div className="pl-card-decoration" aria-hidden="true">{item.id === 'mechanics' ? '↗' : item.id === 'electrostatics' ? '⊕' : '⟳'}</div>
       </article>)}</section>
-      <section className="pl-quick-start"><div><span className="pl-eyebrow">NOT SURE WHERE TO START?</span><h2>Start with a simple experiment.</h2><p>Try changing two hanging masses and watch how the acceleration changes.</p></div><button className="pl-secondary" onClick={() => openTopic('mechanics')}>Open mechanics <span>→</span></button></section>
+      <section className="pl-quick-start"><div><span className="pl-eyebrow">FIELD CHALLENGE / 001</span><h2>Can you predict the outcome?</h2><p>Start with the block and hanging mass. Predict the acceleration, run the model, then explain the difference between your prediction and the result.</p></div><button className="pl-secondary" onClick={() => openTopic('mechanics', 'table-hanging')}>Run the challenge <span>↗</span></button></section>
+      <section className="pl-research-principles"><div><span className="pl-principle-index">A</span><div><strong>Inspectable physics</strong><p>See the equations and assumptions, not just an animation.</p></div></div><div><span className="pl-principle-index">B</span><div><strong>Evidence over guessing</strong><p>Change parameters, measure outcomes, and record observations.</p></div></div><div><span className="pl-principle-index">C</span><div><strong>Honest models</strong><p>Every simulation should state what it includes and what it ignores.</p></div></div></section>
     </main>}
 
     {page === 'topic' && <main className="pl-workspace">
