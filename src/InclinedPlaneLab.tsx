@@ -9,7 +9,7 @@ export default function InclinedPlaneLab({ onSummaryChange }: { onSummaryChange?
   const [gravity, setGravity] = useState(9.81)
 
   const result = useMemo(() => solveInclinedPlane(mass, angle, muStatic, muKinetic, gravity), [mass, angle, muStatic, muKinetic, gravity])
-  const normal = normalReaction
+  const normal = result.normalReaction
 
   const radians = angle * Math.PI / 180
   const blockX = 45 + 165 * Math.cos(radians)
