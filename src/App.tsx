@@ -93,10 +93,10 @@ function App() {
 
     {page === 'welcome' && <main className="pl-welcome">
       <section className="pl-welcome-copy">
-        <div className="pl-eyebrow"><span>✳</span> YOUR VIRTUAL PHYSICS LABORATORY</div>
-        <h1>Don't just learn<br />Physics. <em>Explore it.</em></h1>
-        <p>Change the variables. Run the experiment. See what happens. A hands-on A-level Physics space, built for learners everywhere — including right here in Uganda.</p>
-        <button className="pl-primary" onClick={() => setPage('dashboard')}>Enter Virtual Lab <span>↗</span></button>
+        <div className="pl-eyebrow"><span>✳</span> PHYSICS ENGINE / ACCESS GRANTED</div>
+        <h1>The universe<br />has rules. <em>Test them.</em></h1>
+        <p>A living digital laboratory for minds that ask “what happens if…?” Change initial conditions, expose forces and fields, inspect the mathematics, and test your predictions. Built for UACE — designed to go beyond the syllabus.</p>
+        <button className="pl-primary" onClick={() => setPage('dashboard')}>Enter the research lab <span>↗</span></button>
         <div className="pl-trust"><span>✓</span> Free to use <span>·</span> Works on mobile <span>·</span> Learn at your pace</div>
       </section>
       <section className="pl-welcome-art" aria-label="Physics laboratory illustration">
@@ -105,7 +105,7 @@ function App() {
         <div className="pl-art-center"><div className="pl-orbit-ring ring-one" /><div className="pl-orbit-ring ring-two" /><div className="pl-atom-core">P<span>+</span></div><i className="pl-electron electron-one" /><i className="pl-electron electron-two" /></div>
         <div className="pl-art-caption"><span className="pl-live-dot" /> EXPERIMENTS THAT RESPOND TO YOU</div>
       </section>
-      <section className="pl-welcome-bottom"><div><strong>03</strong><span>Core topic areas</span></div><div><strong>10+</strong><span>Investigations to explore</span></div><div><strong>∞</strong><span>Ways to experiment</span></div><span className="pl-bottom-note">MADE FOR CURIOUS MINDS</span></section>
+      <section className="pl-welcome-bottom"><div><strong>03</strong><span>Core physics domains</span></div><div><strong>12</strong><span>Experiment pathways</span></div><div><strong>∞</strong><span>Hypotheses to test</span></div><span className="pl-bottom-note">MADE FOR CURIOUS MINDS</span></section>
     </main>}
 
     {page === 'dashboard' && <main className="pl-dashboard">
