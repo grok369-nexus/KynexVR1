@@ -87,3 +87,5 @@
 .pl-builder-canvas g{user-select:none;-webkit-user-select:none}
 .pl-properties-grid select{width:100%;min-width:0;border:1px solid #2a4854;border-radius:7px;background:#102631;color:#e1f0f2;padding:9px;font:12px 'DM Sans',sans-serif}
 .pl-builder-tools button:active{transform:scale(.98)}
+
+.pl-tension-picker{display:flex;align-items:center;flex-wrap:wrap;gap:9px;color:#91aab5;font-size:10px;margin:0 0 13px}.pl-tension-picker select{max-width:100%;border:1px solid #2a4854;border-radius:7px;background:#102631;color:#e1f0f2;padding:8px;font:10px 'DM Sans',sans-serif}
