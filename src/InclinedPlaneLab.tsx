@@ -9,13 +9,13 @@ export default function InclinedPlaneLab({ onSummaryChange }: { onSummaryChange?
   const [gravity, setGravity] = useState(9.81)
 
   const result = useMemo(() => solveInclinedPlane(mass, angle, muStatic, muKinetic, gravity), [mass, angle, muStatic, muKinetic, gravity])
-  const normal = result.normalReaction
+  const normal = normalReaction
 
   const radians = angle * Math.PI / 180
   const blockX = 45 + 165 * Math.cos(radians)
   const blockY = 235 - 165 * Math.sin(radians)
   const forceScale = 90 / Math.max(result.weight, 1)
-  useEffect(() => { onSummaryChange?.(`Inclined plane: ${result.staysAtRest ? 'static equilibrium' : 'sliding down'}, normal reaction ${result.normal.toFixed(2)} N, friction ${result.friction.toFixed(2)} N, acceleration ${result.acceleration.toFixed(2)} m/s² at ${angle}°.`) }, [onSummaryChange, result, angle])
+  useEffect(() => { onSummaryChange?.(`Inclined plane: ${result.staysAtRest ? 'static equilibrium' : 'sliding down'}, normal reaction ${normal.toFixed(2)} N, friction ${result.friction.toFixed(2)} N, acceleration ${result.acceleration.toFixed(2)} m/s² at ${angle}°.`) }, [onSummaryChange, result, angle])
 
   const arrow = (x: number, y: number, dx: number, dy: number, color: string, label: string, key: string) =>
     <g key={key}>
@@ -37,7 +37,7 @@ export default function InclinedPlaneLab({ onSummaryChange }: { onSummaryChange?
           <text x="0" y="5" textAnchor="middle" fill="#0a2028" fontSize="12" fontWeight="700">{mass}kg</text>
         </g>
         {arrow(blockX, blockY, 0, result.weight * forceScale, '#f1bd69', 'mg', 'weight')}
-        {arrow(blockX, blockY, -Math.sin(radians) * result.normal * forceScale, -Math.cos(radians) * result.normal * forceScale, '#7db7ff', 'N', 'normal')}
+        {arrow(blockX, blockY, -Math.sin(radians) * normal * forceScale, -Math.cos(radians) * normal * forceScale, '#7db7ff', 'N', 'normal')}
         {arrow(blockX, blockY, Math.cos(radians) * result.friction * forceScale, -Math.sin(radians) * result.friction * forceScale, '#f39caa', 'Friction', 'friction')}
         <path d={`M 82 252 A 47 47 0 0 0 ${82 + 47 * Math.cos(radians)} ${252 - 47 * Math.sin(radians)}`} fill="none" stroke="#f1bd69" strokeWidth="2" />
         <text x="89" y="236" fill="#f1bd69" fontSize="12">{angle}°</text>
@@ -54,7 +54,7 @@ export default function InclinedPlaneLab({ onSummaryChange }: { onSummaryChange?
     <div className="ph-state-note"><strong>{result.staysAtRest ? 'Static equilibrium' : 'Block slides down the plane'}</strong><p>{result.staysAtRest ? 'Static friction is sufficient to balance the component of weight down the slope.' : 'Kinetic friction acts up the slope while the block moves down. The net force determines its acceleration.'}</p></div>
     <div className="ph-readouts">
       <div><span>Weight mg</span><strong>{result.weight.toFixed(2)} <small>N</small></strong></div>
-      <div><span>Normal reaction</span><strong>{result.normal.toFixed(2)} <small>N</small></strong></div>
+      <div><span>Normal reaction</span><strong>{normal.toFixed(2)} <small>N</small></strong></div>
       <div><span>Friction</span><strong>{result.friction.toFixed(2)} <small>N</small></strong></div>
       <div><span>Acceleration</span><strong>{result.acceleration.toFixed(2)} <small>m/s²</small></strong></div>
     </div>
