@@ -19,7 +19,7 @@ It is not enough for an animation to look plausible. Every displayed result shou
 
 ## Current layers
 
-- `src/physics/engine.ts`: analytic models for selected UACE experiments.
+- `src/physics/engine.ts`: analytic models for selected UACE experiments, including an ideal block-on-table plus hanging-mass system.
 - `src/physics/world.ts`: first general world stepper for point-mass bodies, applied forces, gravity, fixed anchors, and semi-implicit Euler integration.
 - `src/*Lab.tsx`: interactive presentation and controls.
 - `tests/physics-engine.test.mjs`: regression tests for analytic models and the first general world stepper.
@@ -48,7 +48,7 @@ The current stepper uses semi-implicit Euler:
 
 Applied forces are one-step inputs and are cleared after the step. Gravity acts continuously. Fixed bodies represent immovable anchors.
 
-This is a first approximation, not a full reality engine. It currently has no collision detection, rope-length constraints, pulley wrap/contact solving, rigid-body rotation, fluid dynamics, or adaptive Runge-Kutta integration. Those capabilities must be added deliberately and tested before being used in experiments.
+The analytic table-plus-hanging-mass model in `engine.ts` solves one ideal arrangement exactly under its stated assumptions. It is not yet connected to the general world stepper as a solved string constraint. The world stepper remains a first approximation, not a full reality engine: it has no collision detection, rope-length constraints, pulley wrap/contact solving, rigid-body rotation, fluid dynamics, or adaptive Runge-Kutta integration. Those capabilities must be added deliberately and tested before being used in experiments.
 
 ## Next engineering milestones
 
@@ -57,7 +57,7 @@ This is a first approximation, not a full reality engine. It currently has no co
 3. Build and test a block-plus-hanging-mass system with tension and contact.
 4. Add collision detection and contact response with explicit restitution/friction assumptions.
 5. Add rotational inertia and torque, then pulley dynamics.
-6. Add energy/momentum diagnostics and timestep/convergence checks.
+6. Expand timestep/convergence checks, then add energy/momentum diagnostics.
 7. Connect the model state to the UI's live vectors, plots, readings, and experiment notebook.
 8. Profile and test on low-memory Android devices and slower connections.
 
