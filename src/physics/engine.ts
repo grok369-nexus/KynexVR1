@@ -143,5 +143,8 @@ export function solveCoulombForce(charge1MicroCoulombs: number, charge2MicroCoul
   const separation = Math.max(separationMetres, 0.000001)
   const signedProduct = charge1MicroCoulombs * charge2MicroCoulombs
   const magnitude = 8.9875517923e9 * Math.abs(signedProduct * 1e-12) / separation ** 2
-  return { magnitude, type: signedProduct < 0 ? 'attractive' as const : 'repulsive' as const }
+  return {
+    magnitude,
+    type: signedProduct === 0 ? 'no-force' as const : signedProduct < 0 ? 'attractive' as const : 'repulsive' as const,
+  }
 }
