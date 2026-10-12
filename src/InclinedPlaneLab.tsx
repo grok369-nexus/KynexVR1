@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
-export default function InclinedPlaneLab() {
+export default function InclinedPlaneLab({ onSummaryChange }: { onSummaryChange?: (summary: string) => void }) {
   const [mass, setMass] = useState(5)
   const [angle, setAngle] = useState(30)
   const [muStatic, setMuStatic] = useState(0.5)
@@ -27,7 +27,9 @@ export default function InclinedPlaneLab() {
   const radians = angle * Math.PI / 180
   const blockX = 45 + 165 * Math.cos(radians)
   const blockY = 235 - 165 * Math.sin(radians)
-  const forceScale = 2.25
+  const forceScale = 90 / Math.max(result.weight, 1)
+  useEffect(() => { onSummaryChange?.(`Inclined plane: ${result.staysAtRest ? 'static equilibrium' : 'sliding down'}, normal reaction ${result.normal.toFixed(2)} N, friction ${result.friction.toFixed(2)} N, acceleration ${result.acceleration.toFixed(2)} m/s² at ${angle}°.`) }, [onSummaryChange, result, angle])
+
   const arrow = (x: number, y: number, dx: number, dy: number, color: string, label: string, key: string) =>
     <g key={key}>
       <line x1={x} y1={y} x2={x + dx} y2={y + dy} stroke={color} strokeWidth="2.5" strokeLinecap="round" />
@@ -41,7 +43,7 @@ export default function InclinedPlaneLab() {
       <svg viewBox="0 0 580 300" role="img" aria-label="Block on a sloped plane showing weight, normal reaction and friction">
         <defs><pattern id="ph-ramp-grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#203b47" strokeWidth="1" /></pattern></defs>
         <rect x="0" y="0" width="580" height="300" fill="url(#ph-ramp-grid)" />
-        <path d={`M 35 252 L ${35 + 310 * Math.cos(radians)} ${252 - 310 * Math.sin(radians)} L ${35 + 310 * Math.cos(radians)} 252 Z`} fill="#183440" stroke="#527582" strokeWidth="2" />
+        <path d={`M 35 252 L ${35 + 250 * Math.cos(radians)} ${252 - 250 * Math.sin(radians)} L ${35 + 310 * Math.cos(radians)} 252 Z`} fill="#183440" stroke="#527582" strokeWidth="2" />
         <line x1="35" y1="252" x2="550" y2="252" stroke="#6b8792" strokeWidth="2" />
         <g transform={`translate(${blockX} ${blockY}) rotate(${-angle})`}>
           <rect x="-22" y="-22" width="44" height="44" rx="5" fill="#72e4c4" stroke="#d8fff4" strokeWidth="2" />
