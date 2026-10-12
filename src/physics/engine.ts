@@ -66,6 +66,58 @@ export function solveAtwood(mass1: number, mass2: number, gravity = 9.81) {
   }
 }
 
+/**
+ * Ideal block-on-table + hanging-mass system.
+ *
+ * Assumptions: frictionless horizontal table, massless inextensible string,
+ * frictionless massless pulley, and negligible air resistance. Positive
+ * acceleration means the hanging mass moves downward.
+ */
+export type TableHangingMassModel = {
+  acceleration: number
+  tension: number
+  tableBlockWeight: number
+  tableNormalReaction: number
+  hangingWeight: number
+  valid: boolean
+}
+
+export function solveTableHangingMass(tableMass: number, hangingMass: number, gravity = 9.81): TableHangingMassModel {
+  const valid = Number.isFinite(tableMass)
+    && Number.isFinite(hangingMass)
+    && Number.isFinite(gravity)
+    && tableMass > 0
+    && hangingMass > 0
+    && gravity > 0
+
+  if (!valid) {
+    return {
+      acceleration: 0,
+      tension: 0,
+      tableBlockWeight: 0,
+      tableNormalReaction: 0,
+      hangingWeight: 0,
+      valid: false,
+    }
+  }
+
+  const totalMass = tableMass + hangingMass
+  const acceleration = hangingMass * gravity / totalMass
+  const tension = tableMass * acceleration
+  const tableBlockWeight = tableMass * gravity
+  const tableNormalReaction = tableBlockWeight
+  const hangingWeight = hangingMass * gravity
+
+  return {
+    acceleration,
+    tension,
+    tableBlockWeight,
+    tableNormalReaction,
+    hangingWeight,
+    valid: true,
+  }
+}
+
 export type InclinedPlaneModel = {
   weight: number
   componentDownSlope: number
