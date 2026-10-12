@@ -89,3 +89,44 @@
 .pl-builder-tools button:active{transform:scale(.98)}
 
 .pl-tension-picker{display:flex;align-items:center;flex-wrap:wrap;gap:9px;color:#91aab5;font-size:10px;margin:0 0 13px}.pl-tension-picker select{max-width:100%;border:1px solid #2a4854;border-radius:7px;background:#102631;color:#e1f0f2;padding:8px;font:10px 'DM Sans',sans-serif}
+
+
+/* Lightweight interactive mechanics labs inspired by PhysicsHub's live-control workflow */
+.ph-lab{display:flex;flex-direction:column;gap:14px;min-width:0;color:#dcebee}
+.ph-sim-canvas{min-width:0;overflow:hidden;border:1px solid #203b47;border-radius:12px;background:#091923}
+.ph-canvas-label{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid #203b47;color:#91aab5;font:9px 'DM Mono',monospace;letter-spacing:.65px}
+.ph-live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#72e4c4;box-shadow:0 0 9px #72e4c477;flex:0 0 auto}
+.ph-sim-canvas svg{display:block;width:100%;height:auto;max-height:360px}
+.ph-playback{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;border-top:1px solid #203b47}
+.ph-action-button{border:1px solid #397b70;background:#143a36;color:#a7f4dc;border-radius:8px;padding:9px 12px;font:600 11px 'DM Sans',sans-serif;cursor:pointer}
+.ph-action-button.secondary{border-color:#2b4854;background:#102631;color:#a9c0c8}
+.ph-time-control{display:flex;align-items:center;gap:8px;flex:1;min-width:130px;color:#91aab5;font-size:10px}
+.ph-time-control strong{color:#dcebee;font-size:11px;white-space:nowrap}
+.ph-time-control input{min-width:50px;flex:1;accent-color:#72e4c4}
+.ph-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:14px;border:1px solid #203b47;border-radius:12px;background:#0a1a26}
+.ph-controls label{display:flex;flex-direction:column;gap:8px;color:#91aab5;font-size:10px;min-width:0}
+.ph-controls label strong{color:#dcebee;font-size:12px;font-weight:600}
+.ph-controls input[type=range]{width:100%;accent-color:#72e4c4;cursor:pointer}
+.ph-readouts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ph-readouts>div{min-width:0;padding:12px 10px;border:1px solid #203b47;border-radius:9px;background:#10232f}
+.ph-readouts span{display:block;min-height:28px;margin-bottom:6px;color:#91aab5;font-size:9px;line-height:1.5}
+.ph-readouts strong{display:block;color:#72e4c4;font:600 17px 'DM Mono',monospace;overflow-wrap:anywhere}
+.ph-readouts small{font:10px 'DM Sans',sans-serif;color:#91aab5}
+.ph-explanation{display:flex;flex-direction:column;gap:8px;padding:14px;border:1px solid #24444e;border-radius:10px;background:#0c202b}
+.ph-explanation>strong{font-size:12px;color:#e0f1f1}
+.ph-explanation>span{font:11px 'DM Mono',monospace;color:#8fe0ca;line-height:1.6}
+.ph-explanation p{margin:0;color:#91aab5;font-size:10px;line-height:1.7}
+.ph-state-note{padding:13px 14px;border:1px solid #3a665c;border-radius:10px;background:#102c2a}
+.ph-state-note strong{font-size:12px;color:#8de7c9}
+.ph-state-note p{margin:6px 0 0;color:#a5c4c2;font-size:10px;line-height:1.7}
+@media(max-width:520px){
+  .ph-controls{padding:11px;gap:11px}
+  .ph-readouts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ph-readouts>div{padding:10px}
+  .ph-readouts span{min-height:0}
+  .ph-readouts strong{font-size:16px}
+  .ph-playback{align-items:stretch}
+  .ph-action-button{padding:9px 10px}
+  .ph-time-control{flex-basis:100%;padding-top:4px}
+  .ph-canvas-label{font-size:8px;padding:10px}
+}
