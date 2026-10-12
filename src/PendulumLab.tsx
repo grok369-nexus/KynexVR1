@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { pendulumState, solvePendulum } from './physics/engine'
 
 export default function PendulumLab({ onSummaryChange }: { onSummaryChange?: (summary: string) => void }) {
   const [length, setLength] = useState(1.2)
@@ -8,13 +9,7 @@ export default function PendulumLab({ onSummaryChange }: { onSummaryChange?: (su
   const [time, setTime] = useState(0)
   const [playing, setPlaying] = useState(false)
 
-  const model = useMemo(() => {
-    const omega = Math.sqrt(gravity / length)
-    const period = 2 * Math.PI / omega
-    const theta0 = amplitude * Math.PI / 180
-    const maxSpeed = Math.sqrt(2 * gravity * length * (1 - Math.cos(theta0)))
-    return { omega, period, theta0, maxSpeed, frequency: 1 / period }
-  }, [length, amplitude, gravity])
+  const model = useMemo(() => solvePendulum(length, amplitude, gravity), [length, amplitude, gravity])
 
   useEffect(() => { setTime(0); setPlaying(false) }, [length, amplitude, gravity])
   useEffect(() => {
@@ -23,16 +18,16 @@ export default function PendulumLab({ onSummaryChange }: { onSummaryChange?: (su
     return () => window.clearInterval(timer)
   }, [playing, model.period])
 
-  const angleNow = model.theta0 * Math.cos(model.omega * time)
-  const angularVelocity = -model.theta0 * model.omega * Math.sin(model.omega * time)
-  const currentSpeed = Math.abs(length * angularVelocity)
-  const currentTension = mass * gravity * Math.cos(angleNow) + mass * length * angularVelocity * angularVelocity
+  const state = pendulumState(length, mass, model, time, gravity)
+  const angleNow = state.angle
+  const currentSpeed = state.speed
+  const currentTension = state.tension
   const radius = 55 + length / 2.5 * 80
   const pivotX = 290
   const pivotY = 35
   const bobX = pivotX + radius * Math.sin(angleNow)
   const bobY = pivotY + radius * Math.cos(angleNow)
-  const leftX = pivotX - radius * Math.sin(model.theta0)
+  const leftX = pivotX - radius * Math.sin(model.initialAngleRadians)
   const rightX = pivotX + radius * Math.sin(model.theta0)
   useEffect(() => { onSummaryChange?.(`Simple pendulum: period ${model.period.toFixed(3)} s, frequency ${model.frequency.toFixed(3)} Hz, maximum speed ${model.maxSpeed.toFixed(2)} m/s; length ${length.toFixed(2)} m, gravity ${gravity.toFixed(2)} m/s².`) }, [onSummaryChange, model.period, model.frequency, model.maxSpeed, length, gravity])
 
