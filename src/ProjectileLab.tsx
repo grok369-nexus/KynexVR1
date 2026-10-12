@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 const G = 9.81
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 
-export default function ProjectileLab() {
+export default function ProjectileLab({ onSummaryChange }: { onSummaryChange?: (summary: string) => void }) {
   const [speed, setSpeed] = useState(18)
   const [angle, setAngle] = useState(45)
   const [height, setHeight] = useState(0)
@@ -54,6 +54,7 @@ export default function ProjectileLab() {
   }).join(' ')
   const currentSpeed = Math.hypot(model.ux, model.uy - gravity * t)
   const currentHeight = Math.max(0, ballY)
+  useEffect(() => { onSummaryChange?.(`Projectile: range ${model.range.toFixed(2)} m, flight time ${model.flightTime.toFixed(2)} s, maximum height ${model.maxHeight.toFixed(2)} m at ${angle}°.`) }, [onSummaryChange, model.range, model.flightTime, model.maxHeight, angle])
 
   return <div className="ph-lab">
     <div className="ph-sim-canvas">
